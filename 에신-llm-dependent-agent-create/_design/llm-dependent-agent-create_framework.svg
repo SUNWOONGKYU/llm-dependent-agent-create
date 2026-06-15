@@ -1,0 +1,199 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" viewBox="0 0 1800 1300" preserveAspectRatio="xMidYMid meet" style="max-width:1800px;display:block;margin:auto;" font-family="Pretendard, 'Malgun Gothic', sans-serif">
+  <defs>
+    <marker id="arw" viewBox="0 0 10 10" markerWidth="9" markerHeight="9" refX="8" refY="5" orient="auto-start-reverse">
+      <path d="M0,0 L9,5 L0,10 z" fill="#2D6A4F"/>
+    </marker>
+    <marker id="arwg" viewBox="0 0 10 10" markerWidth="9" markerHeight="9" refX="8" refY="5" orient="auto-start-reverse">
+      <path d="M0,0 L9,5 L0,10 z" fill="#C9A961"/>
+    </marker>
+    <marker id="arwr" viewBox="0 0 10 10" markerWidth="9" markerHeight="9" refX="8" refY="5" orient="auto-start-reverse">
+      <path d="M0,0 L9,5 L0,10 z" fill="#B33A3A"/>
+    </marker>
+  </defs>
+
+  <rect width="1800" height="1300" fill="#FAFAF7"/>
+  <rect x="12" y="12" width="1776" height="1276" fill="none" stroke="#E6E2D6" stroke-width="2"/>
+
+  <!-- HEADER -->
+  <rect x="60" y="40" width="8" height="76" fill="#C9A961"/>
+  <text x="90" y="80" font-size="34" font-weight="800" fill="#0A1F14">llm-dependent-agent-create</text>
+  <text x="660" y="80" font-size="22" font-weight="600" fill="#2D6A4F">— LLM 의존형 에이전트 제조 공장 (트랙 ②)</text>
+  <text x="90" y="112" font-size="18" fill="#3A3A30">막연한 요청 한 줄 → 인프라 판별 → 9-Phase 공장 → 출하 → 운영 루프 회귀</text>
+  <text x="1740" y="74" font-size="16" font-weight="700" fill="#8A7236" text-anchor="end">FRAMEWORK</text>
+  <text x="1740" y="100" font-size="15" fill="#3A3A30" text-anchor="end">V3.7 · 2026-06-11</text>
+  <line x1="60" y1="140" x2="1740" y2="140" stroke="#E6E2D6" stroke-width="2"/>
+
+  <!-- ① 인프라 분기 -->
+  <text x="90" y="180" font-size="22" font-weight="700" fill="#0A1F14">① 인프라 판별 (Phase 0 첫 결정) — Q-Infra</text>
+
+  <rect x="60" y="200" width="280" height="170" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2" rx="10"/>
+  <text x="200" y="230" font-size="18" font-weight="700" fill="#0A1F14" text-anchor="middle">INPUT</text>
+  <text x="200" y="258" font-size="15" fill="#3A3A30" text-anchor="middle">막연한 요청 한 줄</text>
+  <text x="200" y="282" font-size="14" fill="#3A3A30" text-anchor="middle">"~하는 AI 만들어줘"</text>
+  <line x1="200" y1="298" x2="200" y2="318" stroke="#2D6A4F" stroke-width="2" marker-end="url(#arw)"/>
+  <text x="200" y="338" font-size="14" font-weight="700" fill="#0A1F14" text-anchor="middle">Supabase·DB·인증</text>
+  <text x="200" y="356" font-size="14" font-weight="700" fill="#0A1F14" text-anchor="middle">웹호스팅 있나?</text>
+
+  <!-- A 인프라 박스 -->
+  <rect x="380" y="200" width="640" height="170" fill="#FFF8E7" stroke="#C9A961" stroke-width="2.5" rx="10"/>
+  <text x="400" y="230" font-size="22" font-weight="700" fill="#8A7236">A — Supabase 있음 (YES)</text>
+  <text x="400" y="258" font-size="16" fill="#0A1F14">· 엔진 + DB + 인증 풀세트</text>
+  <text x="400" y="282" font-size="16" fill="#0A1F14">· api/run.py + Supabase + Vercel</text>
+  <text x="400" y="306" font-size="16" fill="#0A1F14">· 모드 = 단일 / 배치 / <tspan font-weight="700">포털 모두 가능</tspan></text>
+  <text x="400" y="330" font-size="14" font-weight="700" fill="#2D6A4F">→ 포털 모드는 A 강제</text>
+
+  <!-- B 인프라 박스 -->
+  <rect x="1060" y="200" width="640" height="170" fill="#F8F6EE" stroke="#2D6A4F" stroke-width="2.5" rx="10"/>
+  <text x="1080" y="230" font-size="22" font-weight="700" fill="#2D6A4F">B — DB 없음 (NO)</text>
+  <text x="1080" y="258" font-size="16" fill="#0A1F14">· 로컬 .py + API 키만 (단일 사용자)</text>
+  <text x="1080" y="282" font-size="14" fill="#0A1F14">· engine.py + 스킬스/{AGENT_ID}_{skill_id}/SKILL.md + run.py</text>
+  <text x="1080" y="306" font-size="16" fill="#0A1F14">· 모드 = 단일 / 배치만 (포털 ✗)</text>
+  <text x="1080" y="330" font-size="14" font-weight="700" fill="#2D6A4F">→ 인증은 환경변수 / .env(dotenv)</text>
+
+  <!-- ② 9-Phase 파이프라인 -->
+  <text x="90" y="430" font-size="22" font-weight="700" fill="#0A1F14">② 9-Phase 파이프라인 (★ Phase 0·6은 트랙 ①과 차이)</text>
+  <text x="90" y="458" font-size="16" fill="#3A3A30">기획 (0~2) → 제작 (3~6) → 출하·운영 (7~9). 같은 9-Phase 골격을 트랙 ①과 공유.</text>
+
+  <!-- 그룹 1: 기획 -->
+  <rect x="60" y="490" width="540" height="220" fill="#F8F6EE" stroke="#C9A961" stroke-width="2" rx="10"/>
+  <text x="80" y="522" font-size="20" font-weight="700" fill="#8A7236">📋 그룹 1 — 기획 (0~2)</text>
+
+  <rect x="80" y="540" width="160" height="80" fill="#FFF8E7" stroke="#C9A961" stroke-width="2.5" rx="6"/>
+  <text x="160" y="568" font-size="17" font-weight="700" fill="#0A1F14" text-anchor="middle">Phase 0 ★</text>
+  <text x="160" y="590" font-size="15" fill="#3A3A30" text-anchor="middle">시동·인프라</text>
+  <text x="160" y="608" font-size="13" fill="#3A3A30" text-anchor="middle">A / B 결정</text>
+
+  <rect x="260" y="540" width="160" height="80" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2" rx="6"/>
+  <text x="340" y="568" font-size="17" font-weight="700" fill="#0A1F14" text-anchor="middle">Phase 1</text>
+  <text x="340" y="590" font-size="15" fill="#3A3A30" text-anchor="middle">스무고개</text>
+  <text x="340" y="608" font-size="13" fill="#3A3A30" text-anchor="middle">10/5/4+3 라운드</text>
+
+  <rect x="440" y="540" width="140" height="80" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2" rx="6"/>
+  <text x="510" y="568" font-size="17" font-weight="700" fill="#0A1F14" text-anchor="middle">Phase 2</text>
+  <text x="510" y="590" font-size="15" fill="#3A3A30" text-anchor="middle">목표·승인</text>
+  <text x="510" y="608" font-size="13" fill="#3A3A30" text-anchor="middle">MBO 게이트</text>
+
+  <line x1="240" y1="580" x2="260" y2="580" stroke="#2D6A4F" stroke-width="2" marker-end="url(#arw)"/>
+  <line x1="420" y1="580" x2="440" y2="580" stroke="#2D6A4F" stroke-width="2" marker-end="url(#arw)"/>
+
+  <text x="80" y="655" font-size="16" fill="#0A1F14">· Phase 0 ★ = 트랙 ② 차이 — 인프라 A/B + 모드(단일/배치/포털) 동시 결정.</text>
+  <text x="80" y="678" font-size="16" fill="#0A1F14">· Phase 1 = 모드별 10/5/4+3 라운드 (단일 1a 10 · 배치 1b 5 · 포털 1c 4+3).</text>
+
+  <line x1="610" y1="600" x2="650" y2="600" stroke="#C9A961" stroke-width="3" marker-end="url(#arwg)"/>
+
+  <!-- 그룹 2: 제작 -->
+  <rect x="660" y="490" width="720" height="220" fill="#F8F6EE" stroke="#C9A961" stroke-width="2" rx="10"/>
+  <text x="680" y="522" font-size="20" font-weight="700" fill="#8A7236">🏭 그룹 2 — 제작 (3~6) ★ 공장 심장</text>
+
+  <rect x="680" y="540" width="160" height="80" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2" rx="6"/>
+  <text x="760" y="568" font-size="17" font-weight="700" fill="#0A1F14" text-anchor="middle">Phase 3</text>
+  <text x="760" y="590" font-size="15" fill="#3A3A30" text-anchor="middle">발굴</text>
+  <text x="760" y="608" font-size="13" fill="#3A3A30" text-anchor="middle">OSS·HF·MCP·사내</text>
+
+  <rect x="860" y="540" width="160" height="80" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2" rx="6"/>
+  <text x="940" y="568" font-size="17" font-weight="700" fill="#0A1F14" text-anchor="middle">Phase 4</text>
+  <text x="940" y="590" font-size="15" fill="#3A3A30" text-anchor="middle">분해·검증</text>
+  <text x="940" y="608" font-size="13" fill="#3A3A30" text-anchor="middle">BOM 5분류</text>
+
+  <rect x="1040" y="540" width="160" height="80" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2" rx="6"/>
+  <text x="1120" y="568" font-size="17" font-weight="700" fill="#0A1F14" text-anchor="middle">Phase 5</text>
+  <text x="1120" y="590" font-size="15" fill="#3A3A30" text-anchor="middle">설계 검증</text>
+  <text x="1120" y="608" font-size="13" fill="#3A3A30" text-anchor="middle">5A + 5B</text>
+
+  <rect x="1220" y="540" width="140" height="80" fill="#FFF8E7" stroke="#C9A961" stroke-width="2.5" rx="6"/>
+  <text x="1290" y="568" font-size="17" font-weight="700" fill="#0A1F14" text-anchor="middle">Phase 6 ★</text>
+  <text x="1290" y="590" font-size="15" fill="#3A3A30" text-anchor="middle">3단 조립</text>
+  <text x="1290" y="608" font-size="13" fill="#3A3A30" text-anchor="middle">6a · 6b · 6c</text>
+
+  <line x1="840" y1="580" x2="860" y2="580" stroke="#2D6A4F" stroke-width="2" marker-end="url(#arw)"/>
+  <line x1="1020" y1="580" x2="1040" y2="580" stroke="#2D6A4F" stroke-width="2" marker-end="url(#arw)"/>
+  <line x1="1200" y1="580" x2="1220" y2="580" stroke="#2D6A4F" stroke-width="2" marker-end="url(#arw)"/>
+
+  <text x="680" y="655" font-size="16" fill="#0A1F14">· Phase 6 ★ = 트랙 ② 차이 — 단일 SKILL.md 대신 6a·6b·6c 3단 분해 조립.</text>
+  <text x="680" y="678" font-size="16" fill="#0A1F14">· 6a 본체 / 6b 플랫폼 레이어(호스팅·UI) / 6c 공통 인프라(인증·LLM 폴백·로그)</text>
+
+  <line x1="1390" y1="600" x2="1430" y2="600" stroke="#C9A961" stroke-width="3" marker-end="url(#arwg)"/>
+
+  <!-- 그룹 3: 출하·운영 -->
+  <rect x="1440" y="490" width="300" height="220" fill="#F8F6EE" stroke="#C9A961" stroke-width="2" rx="10"/>
+  <text x="1460" y="522" font-size="20" font-weight="700" fill="#8A7236">📤 그룹 3</text>
+  <text x="1460" y="546" font-size="18" font-weight="600" fill="#8A7236">출하·운영 (7~9)</text>
+
+  <rect x="1460" y="560" width="120" height="56" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2" rx="6"/>
+  <text x="1520" y="584" font-size="16" font-weight="700" fill="#0A1F14" text-anchor="middle">Phase 7</text>
+  <text x="1520" y="604" font-size="14" fill="#3A3A30" text-anchor="middle">4단 QC</text>
+
+  <rect x="1600" y="560" width="120" height="56" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2" rx="6"/>
+  <text x="1660" y="584" font-size="16" font-weight="700" fill="#0A1F14" text-anchor="middle">Phase 8</text>
+  <text x="1660" y="604" font-size="14" fill="#3A3A30" text-anchor="middle">출하·등재</text>
+
+  <rect x="1460" y="628" width="260" height="56" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2" rx="6"/>
+  <text x="1590" y="652" font-size="16" font-weight="700" fill="#0A1F14" text-anchor="middle">Phase 9 — 운영 루프 ↻</text>
+  <text x="1590" y="673" font-size="13" fill="#3A3A30" text-anchor="middle">에러율·응답·피드백·비용·사용률</text>
+
+  <line x1="1580" y1="588" x2="1600" y2="588" stroke="#2D6A4F" stroke-width="2" marker-end="url(#arw)"/>
+
+  <!-- Phase 9 회귀 -->
+  <path d="M 1590,684 Q 1590,765 800,765 Q 340,765 340,622" fill="none" stroke="#B33A3A" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#arwr)"/>
+  <rect x="780" y="745" width="240" height="40" fill="#FFFFFF" stroke="#B33A3A" stroke-width="1.5" rx="4"/>
+  <text x="900" y="770" font-size="14" font-weight="700" fill="#B33A3A" text-anchor="middle">피드백 → Phase 1 회귀</text>
+
+  <!-- ③ Phase 6 3단 분해 모드별 조합 -->
+  <text x="90" y="850" font-size="22" font-weight="700" fill="#0A1F14">③ Phase 6 3단 조립 — 모드별 어떤 단계를 쓰는가</text>
+
+  <rect x="60" y="870" width="820" height="200" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2" rx="10"/>
+
+  <!-- 표 헤더 -->
+  <rect x="80" y="888" width="120" height="40" fill="#0A1F14"/>
+  <text x="140" y="914" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">모드</text>
+  <rect x="200" y="888" width="180" height="40" fill="#0A1F14"/>
+  <text x="290" y="914" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">6a 본체</text>
+  <rect x="380" y="888" width="180" height="40" fill="#0A1F14"/>
+  <text x="470" y="914" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">6b 플랫폼</text>
+  <rect x="560" y="888" width="180" height="40" fill="#0A1F14"/>
+  <text x="650" y="914" font-size="16" font-weight="700" fill="#FFFFFF" text-anchor="middle">6c 공통 인프라</text>
+  <rect x="740" y="888" width="140" height="40" fill="#0A1F14"/>
+  <text x="810" y="914" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">비고</text>
+
+  <!-- 행 1: 단일 -->
+  <rect x="80" y="928" width="800" height="44" fill="#FAFAF7"/>
+  <text x="140" y="956" font-size="18" font-weight="700" fill="#2D6A4F" text-anchor="middle">단일</text>
+  <text x="290" y="956" font-size="22" font-weight="700" fill="#2D6A4F" text-anchor="middle">✅</text>
+  <text x="470" y="956" font-size="22" fill="#9A9A90" text-anchor="middle">—</text>
+  <text x="650" y="956" font-size="22" fill="#9A9A90" text-anchor="middle">—</text>
+  <text x="810" y="956" font-size="14" fill="#3A3A30" text-anchor="middle">최소 구성</text>
+
+  <!-- 행 2: 배치 -->
+  <rect x="80" y="972" width="800" height="44" fill="#FFFFFF"/>
+  <text x="140" y="1000" font-size="18" font-weight="700" fill="#2D6A4F" text-anchor="middle">배치</text>
+  <text x="290" y="1000" font-size="22" font-weight="700" fill="#2D6A4F" text-anchor="middle">✅</text>
+  <text x="470" y="1000" font-size="22" fill="#9A9A90" text-anchor="middle">—</text>
+  <text x="650" y="1000" font-size="22" font-weight="700" fill="#2D6A4F" text-anchor="middle">✅</text>
+  <text x="810" y="1000" font-size="14" fill="#3A3A30" text-anchor="middle">공통 인프라 공유</text>
+
+  <!-- 행 3: 포털 -->
+  <rect x="80" y="1016" width="800" height="44" fill="#FFF8E7"/>
+  <text x="140" y="1044" font-size="18" font-weight="700" fill="#8A7236" text-anchor="middle">포털</text>
+  <text x="290" y="1044" font-size="22" font-weight="700" fill="#8A7236" text-anchor="middle">✅</text>
+  <text x="470" y="1044" font-size="22" font-weight="700" fill="#8A7236" text-anchor="middle">✅</text>
+  <text x="650" y="1044" font-size="22" font-weight="700" fill="#8A7236" text-anchor="middle">✅</text>
+  <text x="810" y="1044" font-size="14" font-weight="700" fill="#8A7236" text-anchor="middle">A 강제</text>
+
+  <!-- ④ SSOT & 9구동방식 -->
+  <rect x="920" y="870" width="820" height="200" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2" rx="10"/>
+  <text x="940" y="902" font-size="20" font-weight="700" fill="#2D6A4F">④ SSOT (Single Source of Truth)</text>
+  <text x="940" y="930" font-size="16" fill="#0A1F14">위치 = <tspan font-weight="700">스킬스/{AGENT_ID}_{skill_id}/SKILL.md</tspan></text>
+  <text x="940" y="956" font-size="16" fill="#0A1F14">A↔B 이동 시 로직(.md 본문) <tspan font-weight="700">0 변경</tspan>.</text>
+  <text x="940" y="980" font-size="15" fill="#3A3A30">운영 환경(DB·인증·API)은 인프라 따라 다름.</text>
+
+  <line x1="940" y1="994" x2="1720" y2="994" stroke="#E6E2D6" stroke-width="1.5"/>
+  <text x="940" y="1018" font-size="20" font-weight="700" fill="#2D6A4F">⑤ 9구동방식 + 포털형 = 직교 두 축</text>
+  <text x="940" y="1044" font-size="16" fill="#0A1F14"><tspan font-weight="700">9구동방식</tspan> = 에이전트가 "어떻게 일하는가"</text>
+  <text x="940" y="1066" font-size="16" fill="#0A1F14"><tspan font-weight="700">포털형</tspan> = "어떻게 한 화면에 모으는가" (1 호스팅 = N 에이전트)</text>
+
+  <!-- 하단 -->
+  <line x1="60" y1="1110" x2="1740" y2="1110" stroke="#E6E2D6" stroke-width="2"/>
+  <text x="900" y="1160" font-size="22" font-weight="700" fill="#0A1F14" text-anchor="middle">/skill-create와 같은 9-Phase 공장 · 같은 "분해·검증 후 조립" 철학</text>
+  <text x="900" y="1200" font-size="18" fill="#3A3A30" text-anchor="middle">같은 자산을 스킬로도 에이전트로도 재포장 가능 — 양방향</text>
+  <text x="900" y="1240" font-size="15" fill="#3A3A30" text-anchor="middle">본 가이드: PART B · 3 (트랙 ②)</text>
+</svg>
