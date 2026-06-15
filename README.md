@@ -37,7 +37,7 @@ cp -r llm-dependent-agent-create/에신-llm-dependent-agent-create ~/.claude/ski
 ### SKILL.md만 raw 다운로드
 ```bash
 mkdir -p ~/.claude/skills/에신-llm-dependent-agent-create
-curl -L https://raw.githubusercontent.com/SUNWOONGKYU/llm-dependent-agent-create/main/에신-llm-dependent-agent-create/SKILL.md \
+curl -L https://raw.githubusercontent.com/SUNWOONGKYU/llm-dependent-agent-create/main/%EC%97%90%EC%8B%A0-llm-dependent-agent-create/SKILL.md \
      -o ~/.claude/skills/에신-llm-dependent-agent-create/SKILL.md
 ```
 
