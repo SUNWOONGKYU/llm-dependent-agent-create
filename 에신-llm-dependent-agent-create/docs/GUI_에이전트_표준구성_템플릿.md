@@ -109,7 +109,9 @@ UTF-8 파일에 한글이 있으면 줄 디코딩이 깨져 토큰 오류가 폭
 
 ## 3. 화면 구성
 
-**단일 페이지 3단 그리드** (`ui/index.html`, `.grid` — `grid-template-columns: 340px 1fr 344px`):
+**단일 페이지 = 헤더 + 3단 그리드.** 헤더(`<header class="masthead">`, index.html:839) = 좌측에 에이전트 이름 `<h1>` + 버전 배지 + 「Desktop · Owner」(로컬 전용) 배지, 우측에 연결 상태 배지(`#conn-badge`). 헤더 바로 아래에서 3단이 시작되고 사이에 다른 띠를 두지 않는다(원본 주석: "지붕 바로 아래에서 기둥이 시작된다"). 유의사항은 맨 아래 `.footer-line`으로 내린다.
+
+**3단 그리드** (`ui/index.html`, `.grid` — `grid-template-columns: 340px 1fr 344px`):
 
 | 열 | 내용 | 스크롤 |
 |---|---|---|
