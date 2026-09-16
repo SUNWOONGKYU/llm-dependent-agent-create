@@ -1,4 +1,4 @@
-# 에신-llm-dependent-agent-create
+# 에신-llm-dependent-agent-create (V3.22)
 
 Claude Code용 **"에이전트를 만드는 스킬"** ★ 별칭 **에신 (에이전트의 신)** — LLM 의존형 AI 에이전트를 9-Phase 제조 공장으로 출하한다.
 
@@ -46,6 +46,34 @@ curl -L https://raw.githubusercontent.com/SUNWOONGKYU/llm-dependent-agent-create
 ls ~/.claude/skills/ | grep 에신-llm-dependent-agent-create
 ```
 새 Claude Code 세션에서 `/에신-llm-dependent-agent-create [만들 에이전트 설명]`이 인식되면 정상. (실행 중이었다면 재시작.)
+
+## 필수 동반 스킬 — mbo-skill
+
+이 스킬은 **`mbo-skill`(호출 `/mbo`)에 필수 의존**한다. Phase 2 목표서 양식·PO 승인 게이트·MBO 파일 저장·Phase 8 결과 보고(`/mbo report`)가 전부 그 스킬에서 온다. 없으면 착수 전 자동 설치를 시도한다(Phase 0-0).
+
+미리 설치해 두려면:
+```bash
+# Git Bash / macOS / Linux
+mkdir -p ~/.claude/skills/mbo
+curl -fsSL -o ~/.claude/skills/mbo/SKILL.md https://raw.githubusercontent.com/SUNWOONGKYU/mbo-skill/main/SKILL.md
+```
+```powershell
+# Windows PowerShell
+New-Item -ItemType Directory -Force "$HOME\.claude\skills\mbo" | Out-Null
+Invoke-WebRequest -Uri https://raw.githubusercontent.com/SUNWOONGKYU/mbo-skill/main/SKILL.md -OutFile "$HOME\.claude\skills\mbo\SKILL.md"
+```
+저장소: [SUNWOONGKYU/mbo-skill](https://github.com/SUNWOONGKYU/mbo-skill)
+
+## 동봉 문서
+
+- `에신-llm-dependent-agent-create/docs/에이전트_7대_구성요소_상세.md` — 7대 구성요소(페르소나·목표·LLM·지식베이스·도구·안전 체계·자율 루프) 심화 전문. Phase 1 문답·Phase 6a 조립 전 필독.
+- `에신-llm-dependent-agent-create/docs/GUI_에이전트_표준구성_템플릿.md` — 로컬 웹 GUI를 갖춘 에이전트(데스크톱형)의 표준 조립 템플릿. 실제 출하 사례 구성 분석 9절.
+
+## 검증 편제
+
+- **작성자** — 이 스킬을 실행하는 Claude Code 세션 (Opus 5)
+- **V1** — Claude Code Teammate, 제조 미참여 별도 세션·읽기전용 (Sonnet 5)
+- **V2** — Codex CLI (GPT-5.6 Sol) — 미설치·인증 실패·할당량 소진 시 Opus 5 Teammate 폴백
 
 ## 핵심 원칙 (8대 철칙)
 1. 발굴물 무신뢰 — 공개 저장소도 통째 신뢰 금지
