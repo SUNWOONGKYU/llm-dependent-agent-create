@@ -1,0 +1,186 @@
+<svg role="img" aria-labelledby="erT erD" xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" viewBox="0 0 1900 1060" preserveAspectRatio="xMidYMid meet" style="max-width:1900px;display:block;margin:auto;" font-family="Pretendard, 'Malgun Gothic', sans-serif">
+  <title id="erT">에신(llm-dependent-agent-create) 관계도</title>
+  <desc id="erD">LLM 의존형 에이전트 제조 공장 에신을 둘러싼 정적 구조 — 지휘자(PO)와의 접점, 인프라 A/B, 출하 형태 2종, 부품 원천, 산출물, 검증 주체, 제작↔런타임 LLM 분리, 형제 공장과의 관계를 화살표로 정리한 도해.</desc>
+
+  <defs>
+    <marker id="erarw" viewBox="0 0 10 10" markerWidth="9" markerHeight="9" refX="8" refY="5" orient="auto-start-reverse">
+      <path d="M0,0 L9,5 L0,10 z" fill="#2D6A4F"/>
+    </marker>
+    <marker id="erarwg" viewBox="0 0 10 10" markerWidth="9" markerHeight="9" refX="8" refY="5" orient="auto-start-reverse">
+      <path d="M0,0 L9,5 L0,10 z" fill="#8A7236"/>
+    </marker>
+    <marker id="erarwr" viewBox="0 0 10 10" markerWidth="9" markerHeight="9" refX="8" refY="5" orient="auto-start-reverse">
+      <path d="M0,0 L9,5 L0,10 z" fill="#B33A3A"/>
+    </marker>
+    <marker id="erarwd" viewBox="0 0 10 10" markerWidth="9" markerHeight="9" refX="8" refY="5" orient="auto-start-reverse">
+      <path d="M0,0 L9,5 L0,10 z" fill="#5F6B7A"/>
+    </marker>
+  </defs>
+
+  <rect width="1900" height="1060" fill="#FAFAF7"/>
+
+  <!-- HEADER -->
+  <rect x="90" y="82" width="8" height="52" fill="#C9A961"/>
+  <text x="120" y="98" font-size="34" font-weight="800" fill="#0A1F14">에신(llm-dependent-agent-create) — 관계도</text>
+  <text x="120" y="128" font-size="20" fill="#3A3A30">누가 무엇을 만들고 · 검증하고 · 승인하는가 (정적 구조) — 시간 순서·게이트는 llm-dependent-agent-create_flow.svg 참조</text>
+  <text x="1840" y="90" font-size="20" font-weight="700" fill="#8A7236" text-anchor="end">RELATIONS</text>
+  <text x="1840" y="116" font-size="20" fill="#3A3A30" text-anchor="end">SKILL.md 기준 · 2026-09-16</text>
+  <line x1="90" y1="146" x2="1840" y2="146" stroke="#E6E2D6" stroke-width="2"/>
+
+  <!-- 지휘자 PO -->
+  <g transform="translate(700,170)">
+    <rect width="500" height="110" rx="12" fill="#FFF8E7" stroke="#C9A961" stroke-width="2.5"/>
+    <text x="250" y="38" font-size="24" font-weight="800" fill="#8A7236" text-anchor="middle">지휘자 (PO)</text>
+    <text x="250" y="66" font-size="20" fill="#0A1F14" text-anchor="middle">무엇을 만들지 지시하고 결과를 승인하는 사람</text>
+    <text x="250" y="90" font-size="20" fill="#3A3A30" text-anchor="middle">사용자 접점 6개 — Phase 0·1·2·2.5·6(조건부)·8</text>
+  </g>
+
+  <line x1="950" y1="280" x2="950" y2="336" stroke="#8A7236" stroke-width="3" marker-end="url(#erarwg)" marker-start="url(#erarwg)"/>
+  <text x="975" y="300" font-size="20" font-weight="700" fill="#8A7236">지시 · 승인 · 게이트</text>
+  <text x="975" y="324" font-size="20" fill="#3A3A30">(Phase2 MBO 승인 · Phase2.5 리서치 게이트 포함)</text>
+
+  <!-- 에신 스킬 핵심 박스 -->
+  <g transform="translate(560,346)">
+    <rect width="780" height="260" rx="14" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2.5"/>
+    <text x="390" y="40" font-size="23" font-weight="800" fill="#2D6A4F" text-anchor="middle">에신 (llm-dependent-agent-create) 스킬</text>
+    <text x="390" y="66" font-size="20" fill="#0A1F14" text-anchor="middle">시스템구축자(Claude Code)가 실행 — 인프라 A/B 판별부터 시작</text>
+    <line x1="30" y1="82" x2="750" y2="82" stroke="#E6E2D6" stroke-width="1.5"/>
+
+    <rect x="30" y="94" width="230" height="56" fill="#F8F6EE" stroke="#C9A961" stroke-width="1.5" rx="8"/>
+    <text x="145" y="118" font-size="20" font-weight="700" fill="#8A7236" text-anchor="middle">기획</text>
+    <text x="145" y="140" font-size="20" fill="#3A3A30" text-anchor="middle">Phase 0~2.5</text>
+
+    <rect x="275" y="94" width="230" height="56" fill="#F8F6EE" stroke="#C9A961" stroke-width="1.5" rx="8"/>
+    <text x="390" y="118" font-size="20" font-weight="700" fill="#8A7236" text-anchor="middle">제작</text>
+    <text x="390" y="140" font-size="20" fill="#3A3A30" text-anchor="middle">Phase 3~6 (6a·6b·6c)</text>
+
+    <rect x="520" y="94" width="230" height="56" fill="#F8F6EE" stroke="#C9A961" stroke-width="1.5" rx="8"/>
+    <text x="635" y="118" font-size="20" font-weight="700" fill="#8A7236" text-anchor="middle">출하·운영</text>
+    <text x="635" y="140" font-size="20" fill="#3A3A30" text-anchor="middle">Phase 7~9</text>
+
+    <text x="390" y="178" font-size="20" fill="#0A1F14" text-anchor="middle">6a 본체(공통) · 6b 플랫폼(포털만) · 6c 공통 인프라(배치·포털만)</text>
+    <text x="390" y="206" font-size="20" fill="#0A1F14" text-anchor="middle">9대 철칙 — 발굴물 무신뢰 · 제작↔런타임 LLM 분리 · 자기검증 금지 등</text>
+    <text x="390" y="234" font-size="19" fill="#3A3A30" text-anchor="middle">제조 대상 = 운영 가능한 에이전트 자산 (코드·SKILL.md·UI·DB)</text>
+  </g>
+
+  <!-- 인프라 A/B 및 구동방식 2종 및 LLM 분리 : 코어 박스 아래 3분할 -->
+  <g transform="translate(560,630)">
+    <rect width="250" height="130" rx="10" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2"/>
+    <text x="125" y="30" font-size="20" font-weight="800" fill="#2D6A4F" text-anchor="middle">인프라 판별 (Q-Infra)</text>
+    <text x="125" y="58" font-size="19" fill="#0A1F14" text-anchor="middle">A = Supabase 있음</text>
+    <text x="125" y="82" font-size="19" fill="#0A1F14" text-anchor="middle">단일·배치·포털 가능</text>
+    <text x="125" y="106" font-size="19" fill="#0A1F14" text-anchor="middle">B = DB 없음 (포털 ×)</text>
+  </g>
+
+  <g transform="translate(825,630)">
+    <rect width="250" height="130" rx="10" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2"/>
+    <text x="125" y="30" font-size="20" font-weight="800" fill="#2D6A4F" text-anchor="middle">구동방식 2종</text>
+    <text x="125" y="58" font-size="19" fill="#0A1F14" text-anchor="middle">웹사이트형 — 인프라 A</text>
+    <text x="125" y="82" font-size="19" fill="#0A1F14" text-anchor="middle">데스크톱형 — 인프라 B</text>
+    <text x="125" y="106" font-size="19" fill="#3A3A30" text-anchor="middle">(로컬 웹 GUI 표준 출하)</text>
+  </g>
+
+  <g transform="translate(1090,630)">
+    <rect width="250" height="130" rx="10" fill="#FFF8E7" stroke="#C9A961" stroke-width="2.5"/>
+    <text x="125" y="30" font-size="20" font-weight="800" fill="#8A7236" text-anchor="middle">LLM 분리 원칙</text>
+    <text x="125" y="58" font-size="19" fill="#0A1F14" text-anchor="middle">제작 = Claude Code 구독</text>
+    <text x="125" y="82" font-size="19" fill="#0A1F14" text-anchor="middle">런타임 A = API 키</text>
+    <text x="125" y="106" font-size="19" fill="#0A1F14" text-anchor="middle">런타임 B = PO는 CLI 구독</text>
+  </g>
+
+  <line x1="700" y1="606" x2="700" y2="628" stroke="#2D6A4F" stroke-width="2" marker-end="url(#erarw)"/>
+  <line x1="950" y1="606" x2="950" y2="628" stroke="#2D6A4F" stroke-width="2" marker-end="url(#erarw)"/>
+  <line x1="1215" y1="606" x2="1215" y2="628" stroke="#8A7236" stroke-width="2" marker-end="url(#erarwg)"/>
+
+  <!-- 왼쪽: 부품 원천 -->
+  <text x="60" y="366" font-size="20" font-weight="700" fill="#0A1F14">부품 원천 (Phase 3 발굴)</text>
+
+  <g transform="translate(60,384)">
+    <rect width="470" height="60" rx="10" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2"/>
+    <text x="20" y="26" font-size="19" font-weight="700" fill="#0A1F14">공개 저장소</text>
+    <text x="20" y="48" font-size="19" fill="#3A3A30">GitHub 등 — 라이선스 확인 후 부품만</text>
+  </g>
+  <g transform="translate(60,454)">
+    <rect width="470" height="60" rx="10" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2"/>
+    <text x="20" y="26" font-size="19" font-weight="700" fill="#0A1F14">OSS · HF</text>
+    <text x="20" y="48" font-size="19" fill="#3A3A30">오픈소스·HuggingFace 모델·스니펫</text>
+  </g>
+  <g transform="translate(60,524)">
+    <rect width="470" height="60" rx="10" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2"/>
+    <text x="20" y="26" font-size="19" font-weight="700" fill="#0A1F14">MCP 커넥터</text>
+    <text x="20" y="48" font-size="19" fill="#3A3A30">표준 연결 — 지식베이스 경로 4종 중 하나</text>
+  </g>
+  <g transform="translate(60,594)">
+    <rect width="470" height="60" rx="10" fill="#FFFFFF" stroke="#2D6A4F" stroke-width="2"/>
+    <text x="20" y="26" font-size="19" font-weight="700" fill="#0A1F14">사내 자산</text>
+    <text x="20" y="48" font-size="19" fill="#3A3A30">PO 소유 확인으로 라이선스 판정</text>
+  </g>
+
+  <line x1="530" y1="450" x2="555" y2="450" stroke="#2D6A4F" stroke-width="3" marker-end="url(#erarw)"/>
+  <text x="490" y="440" font-size="19" font-weight="700" fill="#2D6A4F" text-anchor="end">발굴</text>
+
+  <!-- 오른쪽: 산출물 -->
+  <text x="1360" y="366" font-size="20" font-weight="700" fill="#0A1F14">산출물</text>
+
+  <g transform="translate(1360,384)">
+    <rect width="480" height="50" rx="8" fill="#FFF8E7" stroke="#C9A961" stroke-width="1.5"/>
+    <text x="20" y="32" font-size="19" fill="#0A1F14">에이전트 기획안 + 출력명세 (Phase 1)</text>
+  </g>
+  <g transform="translate(1360,442)">
+    <rect width="480" height="50" rx="8" fill="#FFF8E7" stroke="#C9A961" stroke-width="1.5"/>
+    <text x="20" y="32" font-size="19" fill="#0A1F14">architecture.svg — 관계도+흐름도 (Phase 1)</text>
+  </g>
+  <g transform="translate(1360,500)">
+    <rect width="480" height="50" rx="8" fill="#FFF8E7" stroke="#C9A961" stroke-width="1.5"/>
+    <text x="20" y="32" font-size="19" fill="#0A1F14">BOM 표 — 5분류+진입게이트 (Phase 4~5)</text>
+  </g>
+  <g transform="translate(1360,558)">
+    <rect width="480" height="50" rx="8" fill="#FFF8E7" stroke="#C9A961" stroke-width="1.5"/>
+    <text x="20" y="32" font-size="19" fill="#0A1F14">운영 자산 — 코드+SKILL.md+UI (Phase 6)</text>
+  </g>
+  <g transform="translate(1360,616)">
+    <rect width="480" height="50" rx="8" fill="#FFF8E7" stroke="#C9A961" stroke-width="1.5"/>
+    <text x="20" y="32" font-size="19" fill="#0A1F14">자산-등재.md 1줄 + 출하 보고서 (Phase 8)</text>
+  </g>
+
+  <line x1="1305" y1="450" x2="1355" y2="450" stroke="#2D6A4F" stroke-width="3" marker-end="url(#erarw)"/>
+  <text x="1315" y="440" font-size="19" font-weight="700" fill="#2D6A4F">생성</text>
+
+  <!-- 하단: 위임 / 검증 / 형제공장 -->
+  <g transform="translate(60,800)">
+    <rect width="470" height="90" rx="10" fill="#FFFFFF" stroke="#5F6B7A" stroke-width="2" stroke-dasharray="6 4"/>
+    <text x="24" y="34" font-size="19" font-weight="700" fill="#0A1F14">/diagram-기본 (위임 스킬)</text>
+    <text x="24" y="60" font-size="19" fill="#3A3A30">Phase 1 아키텍처 SVG 생성을 위임받아 처리</text>
+  </g>
+  <path d="M 700,606 Q 500,700 305,798" fill="none" stroke="#5F6B7A" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#erarwd)"/>
+  <text x="480" y="690" font-size="19" font-weight="700" fill="#5F6B7A">위임</text>
+
+  <text x="640" y="780" font-size="20" font-weight="700" fill="#0A1F14">검증 주체 — 별도 세션, 읽기 전용</text>
+
+  <g transform="translate(630,800)">
+    <rect width="340" height="90" rx="10" fill="#FFFFFF" stroke="#B33A3A" stroke-width="2"/>
+    <text x="20" y="34" font-size="19" font-weight="700" fill="#B33A3A">5A Cross Validator</text>
+    <text x="20" y="60" font-size="19" fill="#3A3A30">Phase 5 — 라운드 S3·M5·L10</text>
+  </g>
+  <g transform="translate(990,800)">
+    <rect width="340" height="90" rx="10" fill="#FFFFFF" stroke="#B33A3A" stroke-width="2"/>
+    <text x="20" y="34" font-size="19" font-weight="700" fill="#B33A3A">Verification Agent</text>
+    <text x="20" y="60" font-size="19" fill="#3A3A30">Phase 7 — 4단 QC + 사람 눈 확인</text>
+  </g>
+
+  <line x1="950" y1="680" x2="850" y2="796" stroke="#B33A3A" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#erarwr)" marker-start="url(#erarwr)"/>
+  <line x1="950" y1="680" x2="1100" y2="796" stroke="#B33A3A" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#erarwr)" marker-start="url(#erarwr)"/>
+
+  <g transform="translate(1360,800)">
+    <rect width="480" height="90" rx="10" fill="#F8F6EE" stroke="#2D6A4F" stroke-width="2" stroke-dasharray="6 4"/>
+    <text x="24" y="34" font-size="19" font-weight="700" fill="#2D6A4F">skill-create-코어5 (형제 공장)</text>
+    <text x="24" y="60" font-size="19" fill="#3A3A30">경계 결정 트리(Phase 0/6 양방향 가드)로 상호 위임</text>
+  </g>
+  <path d="M 1215,606 Q 1400,680 1440,796" fill="none" stroke="#2D6A4F" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#erarw)"/>
+
+  <!-- 하단 캡션 -->
+  <line x1="90" y1="920" x2="1840" y2="920" stroke="#E6E2D6" stroke-width="2"/>
+  <text x="965" y="960" font-size="20" font-weight="700" fill="#0A1F14" text-anchor="middle">관계도 = "누가 무엇을·무엇과" (정적 구조) — 시간 순서·분기·게이트는 llm-dependent-agent-create_flow.svg</text>
+  <text x="965" y="990" font-size="20" fill="#3A3A30" text-anchor="middle">출처: 에신(llm-dependent-agent-create) SKILL.md · 2026-09-16 기준</text>
+
+</svg>

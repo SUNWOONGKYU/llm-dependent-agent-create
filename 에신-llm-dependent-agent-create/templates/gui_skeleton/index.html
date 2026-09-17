@@ -1,0 +1,1026 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{에이전트 이름}}</title>
+<!--
+  ★ GUI 뼈대 (에신 templates/gui_skeleton/index.html) — 원천: 공증 사무 보조 에이전트 v1.3 화면 구성.
+  규칙 (에신 Phase 6 「로컬 GUI 출하 표준」):
+   1. 이 파일을 app/ui/index.html 로 복사한 뒤 {{ }} 자리와 「도메인 교체」 표시 구역만 채운다.
+   2. 블록의 위치·순서·접기(details) 여부·버튼 자리는 바꾸지 않는다. 블록을 다른 기둥으로 옮기지 않는다.
+      (좌 = 무엇으로 일하는가 / 중 = 작업 공간 / 우 = 어디까지 왔는가 + 설정·목표·안전 체계·로그)
+   3. 없는 기능의 블록은 지우지 말고 「해당 없음」 한 줄로 남긴다(예: 기한 관리).
+   4. LLM 은 세 자리(판단·작성 / 1차 검증 / 2차 검증)로만 그린다. 폴백 체인에 다른 CLI 를 끼워 넣지 않는다.
+   5. 안전 체계는 우측에만 있다. 좌측에는 설정·안전 항목을 두지 않는다.
+   6. 목표는 우측(접이식)에만 있다. 좌측 페르소나에는 「하는 일 · 근거 · 판단 및 작성 방법」만.
+   7. 「접수」「작업」 같은 자리 표시 어휘는 도메인 사람이 쓰는 말로 전부 바꾼다(논문: 주제·자료 입력 / 논문 목록 / 집필 기록).
+-->
+<style>
+:root{
+  color-scheme: light dark;
+  --sans:"Malgun Gothic","맑은 고딕",sans-serif;
+  --serif:Batang,"바탕","Noto Serif KR",serif;
+  --bg:#ffffff;
+  --ink:#1c1a16;
+  --sub:#55504a;
+  --faint:#86806f;
+  --line:#c9c2b3;
+  --line-strong:#8a8272;
+  --panel:#f3efe4;
+  --input-bg:#ffffff;
+  --accent-ok:#2f5d3a;
+  --accent-warn:#a6321f;
+  --accent-ok-on:#8fc79c;    
+  --accent-warn-on:#e88b78;
+  --check-fg:#7a6420;
+  --check-bg:#f2ecd9;
+  --btn-run-bg:#6a3d9a;
+  --now:#6a3d9a;
+  --btn-run-bg-hover:#4b2b6e;
+  --btn-run-ink:#faf7f1;
+  --chat-bg:#c9601a;
+  --chat-bg-hover:#a34e14;
+  --chat-ink:#fff8f0;
+  --roof-bg:#16241a;  --roof-ink:#ece6d8;  --roof-sub:#bdb29a;
+  --roof-faint:#9e9078; --roof-line:#304a37; --roof-line-strong:#4f8760;
+  --pillar-panel:#1b2e20; --pillar-input:#163a25;
+  --focus:#9db9d8;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#211e19; --ink:#e9e3d5; --sub:#a89d8b; --faint:#8b8171;
+    --line:#4b4536; --line-strong:#6e6650; --panel:#2a2620; --input-bg:#2a2620;
+    --accent-ok:#7fb8a2; --accent-warn:#d4604f;
+    --check-fg:#cdb45e; --check-bg:#39321f;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:var(--sans); font-size:14px; line-height:1.65;
+  min-height:100vh; display:flex; flex-direction:column;
+}
+h1,h2,h3,legend{font-family:inherit; font-weight:700; margin:0}
+.num{font-variant-numeric:tabular-nums}
+a{color:var(--focus)}
+a:hover{opacity:.85}
+button{
+  font-family:inherit; font-size:13px; color:var(--ink);
+  background:var(--panel); border:1px solid var(--line-strong);
+  padding:6px 14px; cursor:pointer; border-radius:3px;
+}
+button:hover{filter:brightness(.97)}
+button:active{transform:translateY(1px); filter:brightness(.92)}
+button:focus-visible, input:focus-visible, textarea:focus-visible,
+select:focus-visible, a:focus-visible, summary:focus-visible{
+  outline:2px solid var(--focus); outline-offset:1px;
+}
+button.primary{
+  background:var(--btn-run-bg); color:var(--btn-run-ink); border-color:var(--btn-run-bg);
+  font-weight:700;
+}
+button.primary:hover{background:var(--btn-run-bg-hover); filter:none}
+button:disabled{opacity:.45; cursor:not-allowed}
+.chip-group{display:flex; flex-wrap:wrap; gap:6px}
+button.chip{
+  font-size:12px; padding:4px 10px; border-radius:14px;
+  background:var(--panel); border:1px solid var(--line-strong); color:var(--ink); cursor:pointer;
+}
+button.chip.active{background:var(--btn-run-bg); color:var(--btn-run-ink); border-color:var(--btn-run-bg); font-weight:700}
+input[type="file"]::file-selector-button, input[type="file"]::-webkit-file-upload-button{
+  font-family:inherit; font-size:13px; font-weight:700; cursor:pointer;
+  background:var(--btn-run-bg); color:var(--btn-run-ink); border:1px solid var(--btn-run-bg);
+  padding:6px 14px; border-radius:3px; margin-right:8px;
+}
+input[type="file"]::file-selector-button:hover, input[type="file"]::-webkit-file-upload-button:hover{
+  background:var(--btn-run-bg-hover);
+}
+input,textarea,select{
+  font-family:inherit; font-size:14px; color:var(--ink);
+  background:var(--input-bg); border:1px solid var(--line);
+  padding:5px 8px; border-radius:3px; max-width:100%;
+}
+textarea{width:100%; resize:vertical}
+label{display:block; font-size:12.5px; color:var(--sub); margin-bottom:2px}
+table{border-collapse:collapse; width:100%; font-size:13px}
+th{
+  text-align:left; font-weight:700;
+  border-top:2px solid var(--line-strong); border-bottom:1px solid var(--line-strong);
+  padding:6px 8px; background:var(--panel);
+}
+td{border-bottom:1px solid var(--line); padding:6px 8px; vertical-align:top}
+td.num,th.num{text-align:right}
+.table-wrap{overflow-x:auto}
+pre{
+  font-family:inherit; font-size:14px; line-height:1.9;
+  white-space:pre-wrap; word-break:break-all; margin:0;
+  background:var(--panel); border:1px solid var(--line); padding:20px 24px;
+}
+.skip-link{
+  position:absolute; top:-100px; left:8px; z-index:100;
+  background:var(--roof-ink); color:var(--roof-bg); text-decoration:none;
+  padding:8px 14px; font-size:13px; font-weight:700; border-radius:2px;
+  transition:top .12s ease;
+}
+.skip-link:focus{top:8px}
+header.masthead{
+  --ink:var(--roof-ink); --sub:var(--roof-sub); --faint:var(--roof-faint);
+  --line:var(--roof-line); --line-strong:var(--roof-line-strong);
+  --accent-ok:var(--accent-ok-on); --accent-warn:var(--accent-warn-on);
+  flex:0 0 auto; background:var(--roof-bg); color:var(--roof-ink);
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:10px 20px; border-bottom:1px solid var(--roof-line);
+}
+header.masthead .mast-left{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+header.masthead h1{font-size:17px; letter-spacing:.02em}
+.badge{
+  display:inline-block; font-size:11px; padding:2px 8px; border:1px solid var(--line-strong);
+  border-radius:999px; color:var(--sub); white-space:nowrap; vertical-align:1px;
+}
+.badge-local{border-color:var(--roof-line-strong); color:var(--roof-sub)}
+.badge-warn{color:var(--accent-warn); border-color:currentColor; background:transparent}
+.badge-ok{color:var(--accent-ok); border-color:currentColor; background:transparent}
+.badge-check{color:var(--check-fg); border-color:currentColor; background:var(--check-bg)}
+.grid{
+  flex:1 1 auto; display:grid;
+  grid-template-columns:340px 1fr 344px;
+  align-items:stretch;
+}
+.col-left,.col-mid,.col-right{min-width:0; padding:16px 18px 40px}
+@media (min-width:1181px){
+  .col-left,.col-right{
+    position:sticky; top:0; align-self:start;
+    height:100vh; overflow-y:auto; overscroll-behavior:contain;
+  }
+}
+.col-mid{background:var(--bg)}
+.ws-head{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+  padding-bottom:6px; margin:0 0 12px; border-bottom:2px solid var(--line-strong)}
+.ws-head h2{font-size:15px; margin:0}
+.ws-head .ws-ko{font-weight:500; color:var(--sub); font-size:13px}
+.ws-head .cat-caption{font-size:12px}
+.col-left,.col-right{
+  --ink:var(--roof-ink); --sub:var(--roof-sub); --faint:var(--roof-faint);
+  --line:var(--roof-line); --line-strong:var(--roof-line-strong);
+  --panel:var(--pillar-panel); --input-bg:var(--pillar-input);
+  --accent-ok:var(--accent-ok-on); --accent-warn:var(--accent-warn-on);
+  --check-fg:#d8c176; --check-bg:#2c2a17;
+  --now:#c3a3ef;
+  background:var(--roof-bg); color:var(--roof-ink);
+}
+@media (max-width:1180px){
+  .grid{grid-template-columns:1fr 1fr}
+  .col-left{order:1}
+  .col-right{order:2}
+  .col-mid{order:3; grid-column:1 / -1; border-top:1px solid var(--line-strong)}
+}
+@media (max-width:760px){
+  .grid{grid-template-columns:1fr}
+  .col-left{order:1} .col-right{order:2} .col-mid{order:3}
+}
+section.block{margin-bottom:26px}
+section.block > h2{
+  font-size:15px; padding-bottom:5px; margin-bottom:12px;
+  border-bottom:2px solid var(--line-strong);
+}
+section.block > h2 .no{
+  font-size:12px; color:var(--sub); margin-right:10px; font-variant-numeric:tabular-nums;
+}
+section.block.pending{opacity:.55}
+[data-body][inert]{pointer-events:none}
+[data-body][inert] input,[data-body][inert] textarea,[data-body][inert] select{
+  background:var(--panel); color:var(--faint);
+}
+section.block.pending .placeholder{
+  font-size:12.5px; color:var(--faint); margin:0 0 8px;
+  border:none; background:none; padding:0; text-align:left;
+}
+section.block.pending .placeholder::before{content:"○ "}
+.workspace-gate{
+  margin-top:18vh; text-align:center; color:var(--sub);
+}
+.workspace-gate-msg{font-size:15px; line-height:1.7}
+.workspace-gate-sub{font-size:13px; color:var(--faint); margin-top:8px}
+#workspace-gate[hidden]{display:none}
+section.block.pending > h2{color:var(--faint); border-bottom-color:var(--line)}
+.field-fold > summary{
+  font-size:12.5px; font-weight:700; color:var(--ink);
+  padding:7px 0 6px; border-bottom:1px solid var(--line);
+}
+.field-fold[open] > summary{ margin-bottom:6px; }
+.chat-fab{
+  position:fixed; z-index:40;
+  left:var(--fx, auto); top:var(--fy, auto);
+  right:var(--fr, 18px); bottom:var(--fb, 18px);
+  background:var(--chat-bg); color:var(--chat-ink); border:none;
+  border-radius:18px 18px 18px 4px;
+  padding:9px 16px 10px; font-size:12.5px; font-weight:700; cursor:grab;
+  box-shadow:0 3px 10px rgba(0,0,0,.28);
+  touch-action:none; user-select:none;
+}
+.chat-fab:hover{background:var(--chat-bg-hover)}
+.chat-fab.dragging{cursor:grabbing; box-shadow:0 8px 22px rgba(0,0,0,.4)}
+.chat-fab::after{
+  content:""; position:absolute; left:0; bottom:-8px;
+  width:0; height:0; border-style:solid;
+  border-width:9px 11px 0 0; border-color:var(--chat-bg) transparent transparent transparent;
+}
+.chat-fab:hover::after{border-top-color:var(--chat-bg-hover)}
+.chat-panel{
+  position:fixed; z-index:41; width:360px; max-height:70vh;
+  left:var(--fx, auto); top:var(--fy, auto);
+  right:var(--fr, 18px); bottom:var(--fb, 18px);
+  display:flex; flex-direction:column; background:var(--bg); color:var(--ink);
+  border:1px solid var(--chat-bg);
+  border-radius:14px 14px 14px 4px;
+  padding:12px; overflow:visible;
+  box-shadow:0 6px 24px rgba(0,0,0,.32);
+}
+.chat-panel::before, .chat-panel::after{
+  content:""; position:absolute; left:-1px; bottom:-11px;
+  width:0; height:0; border-style:solid;
+}
+.chat-panel::before{
+  border-width:12px 14px 0 0; border-color:var(--chat-bg) transparent transparent transparent;
+}
+.chat-panel::after{
+  border-width:10px 12px 0 0; border-color:var(--bg) transparent transparent transparent;
+  bottom:-9px; left:0;
+}
+.chat-panel .chat-head strong{color:var(--chat-bg)}
+.chat-panel .chat-head{cursor:grab; touch-action:none; user-select:none}
+.chat-panel.dragging .chat-head{cursor:grabbing}
+@media (min-width:1181px){
+  .chat-fab, .chat-panel{ --fr:362px; }
+}
+@media (max-width:1180px) and (min-width:761px){
+  .chat-fab, .chat-panel{ --fr:calc(50vw + 18px); }
+}
+.text-modal-backdrop{
+  position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.45);
+  display:flex; align-items:center; justify-content:center;
+}
+.text-modal{
+  width:min(420px, 90vw); background:var(--bg); color:var(--ink);
+  border:1px solid var(--line-strong); border-radius:6px; padding:16px;
+  box-shadow:0 8px 28px rgba(0,0,0,.35);
+}
+.text-modal-title{font-size:14.5px; font-weight:700; margin-bottom:8px}
+#text-modal-hint{color:var(--sub); font-size:12.5px}
+.text-modal textarea{width:100%; box-sizing:border-box; margin-bottom:10px}
+.text-modal-acts{display:flex; justify-content:flex-end; gap:8px}
+.chat-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px}
+.chat-log{flex:1; overflow:auto; font-size:12.5px; margin-bottom:8px;
+  display:flex; flex-direction:column; gap:6px; padding-right:2px}
+.chat-log .q, .chat-log .a{
+  max-width:82%; padding:7px 11px; line-height:1.6;
+  word-break:keep-all; overflow-wrap:break-word;
+}
+.chat-log .q{
+  align-self:flex-end; background:var(--chat-bg); color:var(--chat-ink);
+  border-radius:12px 12px 4px 12px; font-weight:600; margin-top:6px;
+}
+.chat-log .a{
+  align-self:flex-start; background:var(--panel); color:var(--ink);
+  border:1px solid var(--line); border-radius:12px 12px 12px 4px; white-space:pre-wrap;
+}
+.chat-log .a.msg-error{border-color:var(--accent-warn)}
+.chat-log .cite{align-self:flex-start; max-width:82%; color:var(--sub); font-size:11.5px;
+  padding:0 4px; word-break:keep-all}
+.chat-warn{margin:0 0 8px; font-size:11.5px; line-height:1.55; padding:7px 9px;
+  word-break:keep-all; overflow-wrap:break-word}
+.chat-input{display:flex; gap:6px}
+.chat-input input{flex:1}
+.placeholder{
+  border:1px dashed var(--line); background:var(--panel); color:var(--faint);
+  font-size:12.5px; padding:16px 18px; text-align:center;
+}
+h3.sub-title{
+  font-size:13.5px; margin:18px 0 6px; padding-bottom:4px;
+  border-bottom:1px solid var(--line-strong);
+}
+.autofilled{background:var(--check-bg); border-color:var(--check-fg)}
+.ai-found{background:color-mix(in srgb, var(--btn-run-bg) 12%, transparent);
+  border-color:var(--btn-run-bg)}
+.ai-found-note{font-size:11px; color:var(--btn-run-bg); font-weight:700; margin-top:2px}
+.autofill-note{font-size:11px; color:var(--check-fg); font-weight:700; margin-top:2px}
+.type-fields{
+  grid-column:1 / -1; border-top:1px solid var(--line-strong); margin-top:4px; padding-top:12px;
+}
+.type-fields-head{font-size:12.5px; font-weight:700; margin-bottom:8px}
+.hint-line{font-size:11.5px; color:var(--sub); margin:0 0 8px}
+.warn-list{margin:0 0 10px; padding-left:18px; font-size:12px; color:var(--check-fg)}
+.warn-list li{margin-bottom:2px}
+.cat-block{margin:0 0 18px; border:1px solid var(--line-strong); border-radius:3px;
+  padding:11px 13px; background:var(--panel)}
+.cat-head{display:flex; align-items:baseline; gap:8px; flex-wrap:wrap;
+  padding-bottom:6px; margin-bottom:8px; border-bottom:2px solid var(--line-strong)}
+.cat-head h2{font-size:13.5px}
+.cat-caption{font-size:11px; color:var(--faint)}
+.help-strip{display:flex; gap:8px; padding:8px 10px}
+.help-link{flex:1; display:inline-block; text-align:center; font:inherit; font-size:12.5px;
+  padding:6px 8px; border:1px solid var(--line-strong); border-radius:3px;
+  background:var(--panel); color:inherit; text-decoration:none; cursor:pointer}
+.help-link:hover{filter:brightness(.97)}
+.std-row{margin:8px 0 4px; padding-top:6px; border-top:1px dashed var(--line)}
+.std-inputs{display:flex; gap:6px; align-items:center; margin-top:4px}
+.std-inputs input[data-std-val]{width:64px}
+.std-inputs input[data-std-why]{flex:1; min-width:0}
+.step-no{display:inline-block; min-width:20px; height:20px; line-height:20px; margin-right:8px;
+  border:1px solid var(--line-strong); border-radius:50%; text-align:center; font-size:12px; font-weight:700}   
+#superseded{
+  position:fixed; inset:0; z-index:9999; background:var(--roof-bg); color:var(--roof-ink);
+  display:flex; align-items:center; justify-content:center; text-align:center; padding:24px;
+}
+#superseded .box{max-width:420px}
+#superseded h2{font-size:17px; margin-bottom:10px}
+#superseded p{font-size:13px; color:var(--roof-sub); line-height:1.7; margin:0 0 6px}
+.goal-fixed{font-size:12.5px; line-height:1.6; padding:8px 10px;
+  border-left:3px solid var(--line-strong); background:color-mix(in srgb, var(--ink) 6%, transparent)}
+.panel-title{
+  font-size:14px; padding-bottom:5px; margin-bottom:10px;
+  border-bottom:2px solid var(--line-strong);
+}
+.plain-row{display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 10px;
+  padding:4px 0; font-size:12.5px; border-bottom:1px solid var(--line)}
+.plain-row:last-child{border-bottom:none}
+.plain-row:has(+ details.more-details){border-bottom:none}
+.plain-label{font-weight:700; min-width:74px}
+.plain-desc{color:var(--sub); flex:1 1 120px; min-width:0; font-size:11.5px;
+  word-break:keep-all; overflow-wrap:break-word}
+.row-num{flex:0 0 100%; padding-left:84px; font-size:11px; color:var(--faint);
+  font-variant-numeric:tabular-nums; word-break:keep-all}
+.status-chip{font-size:11px; font-weight:700; white-space:nowrap}
+.status-row{display:flex; justify-content:space-between; gap:8px;
+  border-bottom:1px solid var(--line); padding:6px 0; font-size:13px}
+.status-row .mark-ok{color:var(--accent-ok); font-weight:700}
+.status-row .mark-no{color:var(--accent-warn); font-weight:700}
+.status-hint{font-size:11.5px; color:var(--sub); margin:2px 0 6px;
+  word-break:keep-all; overflow-wrap:break-word}
+.block-note{font-size:11.5px; color:var(--sub); margin:8px 0 0; line-height:1.6;
+  word-break:keep-all; overflow-wrap:break-word}
+.col-alert{
+  font-size:12px; font-weight:700; line-height:1.6; margin:0 0 14px;
+  padding:8px 10px; border:1px solid var(--accent-warn); color:var(--accent-warn);
+  background:color-mix(in srgb, var(--accent-warn) 12%, transparent); border-radius:3px;
+}
+.col-head-act{margin:0 0 10px; text-align:right}
+details.more-details{margin-top:2px; padding-left:10px;
+  border-left:2px solid var(--line); margin-left:2px}
+details.more-details > summary{font-size:11.5px; color:var(--sub); cursor:pointer; padding:3px 0}
+details.more-details > summary:hover{color:var(--ink)}
+details.more-details ul{margin:4px 0 0; padding-left:18px; font-size:11.5px; color:var(--sub)}
+details.more-details li{margin-bottom:2px}
+.st-ok{color:var(--accent-ok); font-weight:700}
+.flash{margin:0 0 14px; padding:11px 14px; border-radius:8px;
+       border:1px solid var(--accent-ok); background:var(--panel);
+       color:var(--accent-ok); font-weight:600; line-height:1.55}
+.flash .flash-sub{display:block; margin-top:3px; color:var(--sub);
+                  font-weight:400; font-size:12.5px}
+.st-warn{color:var(--check-fg); font-weight:700}
+.st-dim{color:var(--ink-soft); font-weight:600}
+.cat-block.unverified .plain-row,
+.cat-block.unverified .block-body, .cat-block.unverified .cat-fold > *:not(summary){opacity:.45}
+.cat-block.unverified .plain-label{color:var(--faint)}
+.win-pick{display:inline-flex; gap:3px; vertical-align:middle}
+.win-pick button{
+  font-size:10.5px; padding:1px 6px; border-radius:9px; line-height:1.6;
+  background:transparent; border:1px solid var(--line-strong); color:var(--sub);
+}
+.win-pick button[aria-pressed="true"]{
+  background:var(--panel); color:var(--ink); border-color:currentColor; font-weight:700;
+}
+button.cat-count{
+  font-size:12px; color:var(--sub); font-variant-numeric:tabular-nums;
+  background:none; border:none; padding:0; cursor:pointer;
+  text-decoration:underline; font-family:inherit;
+}
+button.cat-count:hover{color:var(--ink)}
+button.cat-count::after{content:" ▾"; font-size:9px}
+button.cat-count[aria-expanded="true"]::after{content:" ▴"}
+.gate-list{margin-top:22px; max-width:640px; margin-left:auto; margin-right:auto; text-align:left}
+.gate-row{border:1px solid var(--line-strong); border-radius:4px; padding:10px 12px; margin-bottom:8px}
+.gate-row-btn{
+  display:block; width:100%; text-align:left; cursor:pointer;
+  background:var(--panel); color:var(--ink); font-family:inherit;
+}
+.gate-row-btn:hover{border-color:var(--focus)}
+.gate-row-done{opacity:.62}
+.gate-row-open{border-color:var(--accent-ok); border-left-width:3px}
+.gate-row-head{font-size:13.5px}
+.gate-row-id{font-size:13px; color:var(--ink); margin-top:3px}
+.gate-row-sub{font-size:12px; color:var(--sub); margin-top:2px}
+.gate-row-acts{margin-top:8px; display:flex; flex-wrap:wrap; gap:6px}
+.gate-row-acts button{font-size:12.5px; padding:4px 10px}
+.st-now{color:var(--now); font-weight:800}
+.st-fail{color:var(--accent-warn); font-weight:700}
+.msg-error{color:var(--accent-warn); border:1px solid var(--accent-warn);
+  padding:8px 12px; font-size:13px; margin:8px 0}
+.reason-para{margin:0 0 8px; line-height:1.65}
+.reason-para:last-child{margin-bottom:0}
+.flaw-box{border:1px solid var(--accent-warn); border-radius:6px;
+  padding:10px 12px; margin:0 0 10px; font-size:12.5px}
+.flaw-list{margin:6px 0 0; padding-left:18px}
+.flaw-list li{margin:4px 0; line-height:1.6}
+.restored-block{border:1px solid var(--line); border-radius:6px; margin:0 0 10px}
+.restored-head{font-size:11.5px; font-weight:700; color:var(--sub);
+  padding:6px 10px; border-bottom:1px solid var(--line); background:var(--panel)}
+.restored-body{margin:0; padding:10px; font-size:12.5px; line-height:1.65;
+  white-space:pre-wrap; word-break:break-word; font-family:inherit;
+  max-height:520px; overflow:auto}
+.msg-info{color:var(--sub); font-size:12.5px}
+.form-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px 14px}
+.form-grid .wide{grid-column:1 / -1}
+fieldset{border:1px solid var(--line); padding:12px 14px; margin:0 0 14px; min-width:0}
+fieldset legend{font-size:13px; padding:0 6px}
+.party-row{display:grid; grid-template-columns:104px 1fr 1fr 1.3fr 118px auto; gap:8px; margin-bottom:8px}
+@media (max-width:900px){ .party-row{grid-template-columns:1fr 1fr} }
+.witness-row{display:grid; grid-template-columns:1fr 1.2fr 110px 110px 132px auto; gap:8px; margin-bottom:8px}
+@media (max-width:900px){ .witness-row{grid-template-columns:1fr 1fr} }
+select.unset{border-color:var(--check-fg); background:var(--check-bg); color:var(--check-fg); font-weight:700}
+.unset-note{font-size:11px; color:var(--check-fg); font-weight:700; margin-top:2px}
+.no-finalize{
+  border:1px solid var(--accent-warn); border-left-width:3px;
+  padding:8px 12px; margin:0 0 10px; font-size:12px; color:var(--sub);
+}
+.no-finalize strong{color:var(--accent-warn)}
+.pair-cell{font-size:12px; white-space:pre-wrap; word-break:break-word}
+.pair-cell.mis{color:var(--accent-warn)}
+.drop-zone{
+  border:1px dashed var(--line-strong); padding:18px; text-align:center;
+  color:var(--sub); font-size:13px; margin-bottom:10px;
+}
+.drop-zone.on{border-color:var(--accent-ok); color:var(--accent-ok); background:color-mix(in srgb, var(--accent-ok) 14%, transparent)}
+.upload-item{border:1px solid var(--line); padding:8px 10px; margin-bottom:8px; font-size:12.5px}
+.upload-item .fname{font-weight:700}
+.verify-row{
+  display:grid; grid-template-columns:1fr 1fr auto; gap:10px;
+  border:1px solid var(--line); border-left:3px solid var(--check-fg);
+  padding:8px 10px; margin-bottom:8px; align-items:start;
+}
+.verify-row.confirmed{border-left-color:var(--accent-ok)}
+@media (max-width:900px){ .verify-row{grid-template-columns:1fr} }
+.verify-row .orig{
+  font-size:12px; color:var(--sub); border-left:1px solid var(--line); padding-left:10px;
+  max-height:180px; overflow:auto;
+}
+.verify-row .orig img{max-width:100%; display:block; border:1px solid var(--line)}
+.draft-head{
+  border:1px solid var(--accent-warn); border-bottom:none; color:var(--accent-warn);
+  background:color-mix(in srgb, var(--accent-warn) 12%, transparent); font-size:12.5px; padding:6px 12px;
+  letter-spacing:.15em; text-align:center;
+}
+.md-render{
+  border:1px solid var(--line); padding:12px 14px; font-size:13.5px; line-height:1.6;
+}
+.draft-head + .md-render{border-top:none}
+.md-render h3, .md-render h4, .md-render h5, .md-render h6{margin:14px 0 6px; font-size:14.5px}
+.md-render h3:first-child, .md-render h4:first-child{margin-top:0}
+.md-render p{margin:0 0 8px}
+.md-render blockquote{
+  margin:6px 0; padding:4px 10px; border-left:3px solid var(--line); color:var(--sub); font-size:12.5px;
+}
+.md-render table.md-table{margin:8px 0 12px; font-size:12.5px}
+.md-render table.md-table th, .md-render table.md-table td{padding:5px 7px}
+.steps{list-style:none; margin:0; padding:0}
+.steps li{
+  border-left:2px solid var(--line); padding:5px 0 5px 14px; color:var(--sub); font-size:13px;
+  position:relative;
+}
+.steps li.done{color:var(--ink); border-left-color:var(--accent-ok)}
+.steps li.now{color:var(--accent-ok); font-weight:700; border-left-color:var(--accent-ok)}
+.steps li.now::before{content:"▶"; position:absolute; left:-1px; top:6px; font-size:9px;
+  transform:translateX(-100%); padding-right:3px; color:var(--accent-ok)}
+#gate-list{max-height:460px; overflow-y:auto}
+.case-group{margin-top:8px}
+.case-group + .case-group{margin-top:10px}
+button.group-head{
+  display:flex; width:100%; align-items:baseline; gap:7px; cursor:pointer;
+  background:none; border:none; border-bottom:1px solid var(--line); padding:4px 0;
+  font-family:inherit; font-size:12.5px; color:var(--ink); text-align:left;
+}
+button.group-head:hover{color:var(--focus); border-bottom-color:var(--focus)}
+button.group-head .tw{font-size:9px; color:var(--sub); width:9px}
+button.group-head[aria-expanded="true"] .tw::before{content:"▾"}
+button.group-head[aria-expanded="false"] .tw::before{content:"▸"}
+button.group-head .gcount{
+  margin-left:auto; font-size:12px; color:var(--sub); font-variant-numeric:tabular-nums;
+}
+.group-body{padding-top:8px}
+.case-search{display:flex; gap:5px; margin-bottom:8px}
+.case-search input{flex:1; min-width:0; font-size:12.5px; padding:4px 7px}
+.case-search button{font-size:12.5px; padding:4px 10px}
+.case-search-out{font-size:11.5px; color:var(--sub); margin:0 0 6px}
+.steps li.norec{color:var(--faint)}
+.steps li .norec-tag{font-size:10px; color:var(--faint); margin-left:6px;
+  border:1px solid currentColor; border-radius:2px; padding:0 3px}
+.steps li .mark-who{display:block; font-size:10.5px; color:var(--sub); font-weight:400}
+.audit-list{list-style:none; margin:0; padding:0; font-size:12px; color:var(--sub);
+  max-height:280px; overflow:auto}
+.audit-list li{border-bottom:1px solid var(--line); padding:4px 0}
+.audit-list .t{font-family:Consolas,monospace; margin-right:6px}
+.calc-item{border-bottom:1px solid var(--line); padding:8px 0}
+.calc-flag{font-size:12px; color:var(--check-fg); line-height:1.6; margin-top:4px}
+.calc-item .amount{font-size:16px}
+.basis{font-size:12px; color:var(--sub)}
+.check-item{border-bottom:1px solid var(--line); padding:6px 0; font-size:13px}
+.check-item .note{font-size:12px; color:var(--sub)}
+.check-item .warn{font-size:12px; color:var(--accent-warn)}
+.footer-line strong{color:var(--ink)}
+.footer-line{flex:0 0 auto; background:var(--panel); padding:12px 20px 18px;
+  border-top:3px double var(--line-strong); font-size:11.5px; color:var(--sub)}
+.footer-line .foot-row{margin:0 0 5px; line-height:1.55}
+.footer-line .foot-notice{margin-top:6px}
+.footer-line .foot-notice summary{cursor:pointer}
+.footer-line .foot-notice-body{margin-top:6px; padding:8px 10px; border:1px solid var(--line-strong); border-radius:3px}
+.footer-line .foot-notice-body p{margin:0 0 6px}
+.footer-line a{color:inherit}
+.doc-meta{display:grid; grid-template-columns:1fr 1fr auto; gap:8px 12px;
+  margin-top:8px; padding-top:8px; border-top:1px dashed var(--line); align-items:end}
+@media (max-width:900px){ .doc-meta{grid-template-columns:1fr} }
+.doc-meta .media{font-size:12px; color:var(--sub)}
+.video-item{border:1px solid var(--line); border-left:3px solid var(--check-fg);
+  padding:8px 10px; margin-bottom:8px; font-size:12.5px}
+.video-item.kept{border-left-color:var(--accent-ok)}
+.video-item .fname{font-weight:700}
+.cat-fold{margin-bottom:10px}
+.cat-fold > summary{cursor:pointer; padding:8px 10px; border:1px solid var(--line, #d0d0d0);
+  border-radius:4px; font-weight:700; font-size:13px; list-style:none}
+.cat-fold > summary::-webkit-details-marker{display:none}
+.cat-fold > summary::before{content:"▸ "; color:var(--sub)}
+.cat-fold[open] > summary::before{content:"▾ "}
+.cat-fold > summary:hover{background:rgba(127,127,127,.08)}
+.cat-fold > summary .cat-caption{font-weight:400; margin-left:6px}
+.cat-fold[open] > summary{margin-bottom:8px}
+.brain-alert{border:2px solid var(--accent-warn, #c00); border-left-width:6px;
+  background:rgba(204,0,0,.06); padding:10px 12px; margin:0 0 12px;
+  font-size:13px; line-height:1.7; border-radius:4px}
+.brain-alert strong{color:var(--accent-warn, #c00)}
+.brain-alert .brain-alert-ok,
+.brain-alert .brain-alert-how{display:block; margin-top:4px; color:var(--sub)}
+.deed-paper{max-height:520px; overflow:auto; border:1px solid var(--line, #d0d0d0);
+  background:#fff; padding:10px}
+.deed-page{border-bottom:2px dashed #bbb; padding:14px 16px 10px; color:#111}
+.deed-landscape{overflow-x:auto}
+.deed-landscape .deed-line{white-space:pre}
+.deed-page:last-child{border-bottom:none}
+.deed-formno{font-size:11px; color:#666; margin-bottom:8px}
+.deed-line{font-family:var(--serif, Batang, "바탕", serif); font-size:13.5px;
+  line-height:1.9; white-space:pre-wrap; word-break:keep-all;
+  border-bottom:1px solid #e8e8e8; min-height:1.9em}
+.deed-center{text-align:center; letter-spacing:.25em; font-weight:700}
+.deed-paper-note{font-size:11px; color:#777; text-align:right; margin-top:6px}
+.deed-blank{border-bottom:1px solid #c00; color:#c00; padding:0 2px}
+#print-sheet{display:none}
+@media print{
+  body.printing > *{display:none !important}
+  body.printing #print-sheet{display:block !important; background:#fff; color:#000;
+    font-family:var(--sans); font-size:13px; line-height:1.7}
+  #print-sheet h1{font-size:19px; margin:0 0 4px}
+  #print-sheet h2{font-size:14px; margin:16px 0 6px; padding-bottom:3px; border-bottom:1px solid #000}
+  #print-sheet .p-notice{border:1px solid #000; padding:8px 10px; margin:10px 0; font-size:12px}
+  #print-sheet ul{margin:0 0 8px; padding-left:18px}
+  #print-sheet li{margin-bottom:3px}
+  #print-sheet pre{border:none; background:none; padding:0; font-size:13px; line-height:1.75}
+  #print-sheet .p-sub{font-size:12px; color:#333}
+  #print-sheet .tok-check{font-weight:700}
+  #print-sheet .tok-na{font-style:italic; color:#555}
+  #print-sheet .deed-print-page{page-break-inside:avoid}
+  #print-sheet .deed-landscape .deed-line{white-space:pre; font-size:10px; line-height:1.5}
+  #print-sheet .deed-break{page-break-before:always}
+  #print-sheet .deed-line{font-family:Batang, "바탕", serif; font-size:12pt;
+    line-height:2.0; white-space:pre-wrap; word-break:keep-all;
+    border-bottom:1px solid #999; min-height:2em}
+  #print-sheet .deed-center{text-align:center; letter-spacing:.4em; font-weight:700}
+  #print-sheet .deed-blank{border-bottom:1.5px solid #000; color:#000}
+  @page{margin:16mm}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important; transition:none !important; scroll-behavior:auto !important}
+}
+.spin{display:inline-block; animation:spin 1.2s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.just-appeared{animation:justAppeared 1.8s ease-out 1}
+@keyframes justAppeared{
+  0%{box-shadow:0 0 0 3px var(--focus, #2563eb)}
+  100%{box-shadow:0 0 0 0 transparent}
+}
+.tok-check{color:var(--accent-warn); font-weight:700}
+.tok-na{color:var(--faint)}
+[hidden]{display:none !important}
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">가운데 작업 영역으로 건너뛰기</a>
+<div id="superseded" hidden>
+  <div class="box">
+    <h2>이 창은 닫혔습니다</h2>
+    <p>{{에이전트 이름}}을(를) 새로 띄워서 이 창은 더 이상 쓰지 않습니다.</p>
+    <p>새로 열린 창에서 계속하세요. 이 창은 곧 자동으로 닫힙니다.</p>
+  </div>
+</div>
+
+<!-- ══ 헤더 — 지붕. 바로 아래에서 세 기둥이 시작된다. 사이에 띠를 두지 않는다. ══ -->
+<header class="masthead">
+  <div class="mast-left">
+    <h1>{{에이전트 이름}}</h1>
+    <span class="badge">v{{버전}}</span>
+    <span class="badge badge-local">Desktop · Owner</span>
+  </div>
+  <span class="badge" id="conn-badge">연결 확인 중…</span>
+</header>
+
+<div class="grid">
+  <!-- ══ 좌 기둥 — 이 프로그램이 «무엇으로 일하는가». 순서 고정: 상태 새로 고침 → 페르소나(접기) → LLM(고정) → 도구(접기) → 지식베이스(접기) ══ -->
+  <aside class="col-left" aria-label="실행 환경">
+    <p class="col-alert" id="status-alert" hidden>
+      <strong>이 창은 프로그램과 연결이 끊겼습니다.</strong>
+      검은 창을 닫으셨거나, 시작.bat 을 다시 눌러 새 창이 열린 뒤 남은 옛 창입니다.
+      <strong>이 창을 닫고 시작.bat 을 다시 누르십시오.</strong>
+      아래에 보이는 것은 끊기기 전 마지막 모습이라 지금 상태가 아닙니다.
+    </p>
+    <p class="col-head-act"><button type="button" id="btn-refresh-status" class="primary">상태 새로 고침</button></p>
+
+    <details class="cat-fold" id="fold-persona">
+      <summary><span class="cat-fold-title">페르소나</span><span class="cat-caption">무엇을 하는가</span></summary>
+    <div class="cat-block">
+      <div class="plain-row">
+        <span class="plain-label">하는 일</span>
+        <span class="plain-desc">{{한 줄 — 예: 학위논문 작성}}</span>
+      </div>
+      <div class="plain-row">
+        <span class="plain-label">근거</span>
+        <span class="plain-desc">{{이 에이전트가 따르는 규칙·지침 3종}}</span>
+      </div>
+      <details class="more-details">
+        <summary>판단 및 작성 방법</summary>
+        <ul>
+          <li>{{문체·태도 한 줄}}</li>
+          <li>모르는 것은 <strong>추정 없이 「확인 필요」</strong></li>
+          <li>프로그램 내부 표기(파일명·항목명)는 문장에 쓰지 않음</li>
+        </ul>
+      </details>
+    </div>
+    </details>
+
+    <!-- LLM — 없으면 일이 아예 안 되므로 접지 않는다. 세 자리는 JS VERIFY_ROWS 가 그린다. -->
+    <div class="cat-block">
+      <div class="cat-head"><h2>LLM</h2><span class="cat-caption">판단·작성·검증을 맡는다</span></div>
+      <div id="llm-status" aria-live="polite"><p class="msg-info">확인하는 중…</p></div>
+      <p class="block-note">※ 구독제 사용 · API 키 미사용</p>
+    </div>
+
+    <details class="cat-fold" id="fold-tools">
+      <summary><span class="cat-fold-title">도구</span><span class="cat-caption">읽고 계산하는 도구</span></summary>
+    <div class="cat-block">
+      <!-- 「코드 계산」이 맨 위 — 이 블록에서 유일하게 «없음»이 뜰 수 없는 줄 -->
+      <div class="plain-row">
+        <span class="plain-label">자동 계산</span>
+        <span class="plain-desc">AI 사용하지 않고 코드로 계산</span>
+        <span class="status-chip st-ok">내장</span>
+        <span class="row-num">{{코드로 계산하는 항목 나열}}</span>
+      </div>
+      <p class="block-note">※ {{아래 도구가 없을 때 사람이 무엇을 대신해야 하는지 한 줄}}</p>
+      <div id="status-list" aria-live="polite"><p class="msg-info">확인하는 중…</p></div>
+    </div>
+    </details>
+
+    <details class="cat-fold" id="fold-kb">
+      <summary><span class="cat-fold-title">지식베이스</span><span class="cat-caption">지식이 들어오는 4대 경로</span></summary>
+    <div class="cat-block">
+      <div id="kb-inject-row"></div>   <!-- ① 직접 주입 — skills/*.md 규칙, 프롬프트에 그대로 -->
+      <details id="fold-standards" class="more-details">
+        <summary>{{사용자가 정하는 기준 — 예: 학교 양식 기준}} <span class="cat-caption" id="standards-summary">확인하는 중…</span></summary>
+        <div class="status-hint" style="margin-top:6px">
+          {{규칙이 정하지 않은 값은 사용자가 정한다는 설명}} 값과 <strong>근거</strong>를 함께 적고 [저장]하십시오.
+          비워 두면 산출물에 「확인 필요」로 나갑니다 — 지어내지 않습니다.
+          <div id="standards-form"></div>
+          <p style="margin:8px 0 0">
+            <button type="button" id="btn-standards-save" class="primary">저장</button>
+            <span id="standards-out" class="msg-info" aria-live="polite"></span>
+          </p>
+        </div>
+      </details>
+      <div id="kb-rag-row"></div>      <!-- ② RAG — 투입 자료(vault) -->
+      <div id="kb-api-row"></div>      <!-- ③ API — 외부 조회(있으면) -->
+      <div id="kb-mcp-row"></div>      <!-- ④ MCP — 있으면, 없으면 「해당 없음」 -->
+      <div id="kb-experience-row"></div><!-- 작업 지식 — 누적 기록 -->
+    </div>
+    </details>
+  </aside>
+
+  <!-- ══ 가운데 — 작업 공간(흰 종이). 작업을 열기 전엔 비어 있다. 단계 카드는 도메인 교체 구역. ══ -->
+  <main class="col-mid" id="main-content" tabindex="-1">
+    <div class="ws-head">
+      <h2>Workspace <span class="ws-ko">(작업공간)</span></h2>
+      <span class="cat-caption" id="ws-caption">{{작업 단위}} 하나를 여기서 처리합니다 — 오른쪽 「작업 목록」에서 고르거나 [+ 새 {{작업 단위}} 접수]</span>
+    </div>
+    <div id="flash" class="flash" hidden role="status" aria-live="polite"></div>
+    <div id="brain-alert" class="brain-alert" hidden role="alert">
+      <strong>LLM(Claude Code)을 찾지 못했습니다.</strong>
+      <span id="brain-alert-what">LLM 이 없으면 {{핵심 기능}}이 되지 않습니다. 아래 [설치 도우미 열기]를 눌러 준비를 마치십시오.</span>
+      <span class="brain-alert-how"><button type="button" id="btn-open-setup" class="primary">설치 도우미 열기</button></span>
+    </div>
+    <details id="setup-helper" class="block" hidden>
+      <summary><strong>설치 도우미</strong> <span class="cat-caption" id="setup-summary">처음 한 번만 하는 준비 — 위에서부터 차례로</span></summary>
+      <div class="block-body" style="padding-top:8px">
+        <p class="status-hint" id="setup-note"></p>
+        <div id="setup-must"></div>
+        <p style="margin-top:10px"><button type="button" id="btn-setup-recheck">다시 확인</button>
+          <span id="setup-out" class="msg-info" aria-live="polite"></span></p>
+      </div>
+    </details>
+    <div id="workspace-gate" class="workspace-gate">
+      <p class="workspace-gate-msg" id="workspace-gate-msg">
+        오른쪽 <strong>「작업 목록」</strong>에서 {{작업 단위}}을(를) 고르거나
+        <strong>[+ 새 {{작업 단위}} 접수]</strong>를 누르면 여기에 작업 화면이 나타납니다.
+      </p>
+    </div>
+    <div id="workspace-body" hidden>
+      <!-- ▼ 도메인 교체 구역 — 단계 카드. 번호·제목은 우측 「진행 단계」 목록과 1:1 로 같아야 한다. -->
+      <section class="block" id="sec-step1"><h2><span class="no">1</span>{{단계 1 이름}}</h2>
+        <div class="block-body">{{입력 폼}}</div></section>
+      <section class="block" id="sec-step2"><h2><span class="no">2</span>{{단계 2 이름}}</h2>
+        <div class="block-body"></div></section>
+      <!-- … 단계 N 까지 -->
+      <!-- ▲ 도메인 교체 구역 끝 -->
+    </div>
+  </main>
+
+  <!-- ══ 우 기둥 — «어디까지 왔는가». 순서 고정: 매뉴얼·설치 도우미 → 설정(접기) → 작업 목록(고정) → 목표(접기) → 진행 단계(고정) → 안전 체계(접기) → 오늘의 작업 로그(접기) → 기한/대기 관리(접기, 없으면 「해당 없음」) ══ -->
+  <aside class="col-right" aria-label="작업 진행과 관리">
+    <div class="cat-block help-strip" id="help-strip">
+      <a href="/manual" target="_blank" rel="noopener" id="link-manual" class="help-link">사용자 매뉴얼</a>
+      <button type="button" id="btn-open-setup-side" class="help-link">설치 도우미</button>
+    </div>
+
+    <details class="cat-fold" id="fold-office">
+      <summary><span class="cat-fold-title">{{설정 블록 이름 — 예: 학교·프로필 설정}}</span>
+        <span class="cat-caption">{{무엇에 찍히는 값인지 — 한 번만}}</span></summary>
+      <div class="cat-block">
+        <p class="status-hint" id="office-note">{{여기 적은 값이 어디에 쓰이는지}}</p>
+        <div id="office-form" class="form-grid"></div>
+        <p style="margin:8px 0 0"><button type="button" id="btn-office-save" class="primary">저장</button>
+          <span id="office-out" class="msg-info" aria-live="polite"></span></p>
+      </div>
+    </details>
+
+    <div class="cat-block">
+      <div class="cat-head"><h2>작업 목록</h2>
+        <button type="button" id="intake-count" class="cat-count" aria-expanded="false"></button></div>
+      <p style="margin:0 0 8px"><button type="button" class="primary" id="btn-new-case" disabled>+ 새 {{작업 단위}} 접수</button></p>
+      <div id="intake-fail" class="msg-error" hidden role="alert" style="margin:0 0 8px"></div>
+      <div id="gate-list"></div>   <!-- 진행 중 / 완료(접힘, 건수만) — JS renderJobList -->
+    </div>
+
+    <details class="cat-fold" id="fold-goal">
+      <summary>목표 <span class="cat-caption">이 {{작업 단위}}에서 무엇을 하나</span></summary>
+    <div class="cat-block">
+      <div class="goal-fixed" id="goal-text">{{목표 한 줄}}</div>
+      <div class="plain-row" style="margin-top:8px">
+        <span class="plain-label">완료 기준</span>
+        <span class="plain-desc">{{완료 기준 한 줄}}</span>
+      </div>
+    </div>
+    </details>
+
+    <div class="cat-block">
+      <div class="cat-head"><h2>진행 단계 (자율 루프)</h2>
+        <span class="badge" id="stage-restored" hidden>기록에서 되살림</span></div>
+      <ol class="steps" id="stage-list">
+        <li data-stage="0">{{단계 1 이름}}</li>
+        <li data-stage="1">{{단계 2 이름}}</li>
+        <!-- … 가운데 단계 카드와 1:1 -->
+      </ol>
+      <div id="chapProg" class="status-hint"></div>   <!-- {{작업 단위}}별 상태·점수·호출 수 (STATUS_CONTRACT.items) -->
+      <details class="more-details" id="stage-restored-why" hidden>
+        <summary>「기록 없음」의 뜻</summary>
+        <div class="status-hint">저장된 기록을 읽어 되살린 진행입니다. <strong>기록에 없는 단계는 「기록 없음」으로 둡니다</strong> — 짐작으로 «끝남»으로 칠하지 않습니다.</div>
+      </details>
+    </div>
+
+    <details class="cat-fold" id="fold-safe">
+      <summary>안전 체계 <span class="cat-caption">경계와 가드레일</span></summary>
+    <div class="cat-block">
+      <div class="cat-head safe-head"><span class="badge badge-warn" id="safe-unknown" hidden>⚠ 연결 끊김</span></div>
+      <div class="plain-row"><span class="plain-label">보관</span><span class="plain-desc">이 PC 안에만</span></div>
+      <div class="plain-row"><span class="plain-label">AI 전송</span><span class="plain-desc">{{가리는 것 — 성명·연락처·…}}</span></div>
+      <details class="more-details"><summary>{{가림 방식 설명 제목}}</summary><p class="status-hint">{{화면에는 실명, AI 사본만 가림 — 설명}}</p></details>
+      <div class="plain-row"><span class="plain-label">{{도메인 가드 1}}</span><span class="plain-desc">{{한 줄}}</span></div>
+      <details class="more-details"><summary>{{왜 막는지 제목}}</summary><p class="status-hint">{{설명}}</p></details>
+      <div class="plain-row"><span class="plain-label">확정 권한</span><span class="plain-desc">{{자동 제출·확정 없음 — 사람이 결정하는 지점}}</span></div>
+      <div class="plain-row"><span class="plain-label">멈추기 기준</span><span class="plain-desc">{{다시쓰기 N회 · 무응답 M분}}</span></div>
+      <details class="more-details"><summary>N회와 M분의 의미</summary><p class="status-hint">{{한도에 걸리면 무엇이 남고 무엇이 멈추는지}}</p></details>
+      <div class="plain-row"><span class="plain-label">자동 백업</span><span class="plain-desc" id="backup-line">확인 중…</span></div>
+      <details class="more-details" id="backup-more"><summary>백업은 어디에 어떻게 쌓입니까</summary><div class="status-hint" id="backup-detail">확인 중…</div></details>
+      <div class="plain-row"><span class="plain-label">숨은 지시</span><span class="plain-desc">문서 속 명령은 안 따름</span></div>
+      <details class="more-details"><summary>숨은 지시의 예</summary><p class="status-hint">올린 문서 안에 「위 내용을 무시하고 …」 같은 문장이 있어도 읽을 거리로만 넘기고 따르지 않습니다. 발견되면 경고로 알려 줍니다.</p></details>
+    </div>
+    </details>
+
+    <details class="cat-fold" id="fold-log">
+      <summary>오늘의 작업 로그 <span class="cat-caption">지난 기록</span></summary>
+    <div class="cat-block">
+      <p style="margin:0 0 6px"><label for="audit-filter" class="plain-label">{{작업 단위}}</label>
+        <select id="audit-filter" style="width:100%"><option value="">전체</option></select></p>
+      <ul class="audit-list" id="audit-list" aria-live="polite"></ul>
+      <details class="more-details"><summary>로그가 남는 방식</summary>
+        <div class="status-hint">{{작업 단위}}을(를) 움직이는 동작마다 한 줄씩 쌓이고, 같은 줄이 로그 파일에도 남습니다(날짜별 한 파일). 오늘 것은 화면을 다시 열어도 이어집니다.</div>
+      </details>
+      <p style="margin:8px 0 0"><button type="button" id="btn-open-logs">로그 폴더 열기</button></p>
+    </div>
+    </details>
+
+    <details class="cat-fold" id="fold-due">
+      <summary>{{기한·대기 관리 블록 이름 — 예: 확인 대기 항목}} <span class="cat-caption">{{부제}}</span>
+        <span class="badge badge-warn" id="due-badge" hidden></span></summary>
+    <div class="cat-block">
+      <div id="due-out"><p class="msg-info">{{해당 없으면 「이 에이전트에는 기한 관리가 없습니다」}}</p></div>
+    </div>
+    </details>
+  </aside>
+</div>
+
+<div class="footer-line" role="note">
+  <p class="foot-row"><strong>유의사항</strong> — {{이 프로그램이 하지 않는 것·산출물의 성격(초안임)}}</p>
+  <p class="foot-row"><strong>기록</strong> — {{기록이 PC 밖으로 나가지 않음 · LLM 에 보낼 때 무엇을 가리는지}}</p>
+  <p class="foot-row"><strong>끝낼 때</strong> — 검은 창을 닫으십시오. 인터넷 창만 닫으면 프로그램은 계속 켜져 있습니다.</p>
+  <details class="foot-notice" id="third-party-notice">
+    <summary><strong>고지사항</strong> — 이 프로그램이 쓰는 공개 소프트웨어: {{목록}} ▸ 저작권과 사용 조건 보기</summary>
+    <div class="foot-notice-body">{{라이선스 문단들}}</div>
+  </details>
+</div>
+
+<!-- 액션봇 — 실행형이 기본(채팅 주체 = 행동 주체 + 되돌리기 어려운 일은 confirm). 조회 전용은 공증형 예외. -->
+<button type="button" id="chat-open" class="chat-fab">AI 대화</button>
+<div id="chat-panel" class="chat-panel" hidden>
+  <div class="chat-head"><strong>AI 대화</strong><button type="button" id="chat-close">닫기</button></div>
+  <div class="no-finalize chat-warn"><strong>{{되돌리기 어려운 일은 확인창을 거칩니다}}</strong> · {{가리는 것}}</div>
+  <div id="chat-log" class="chat-log"></div>
+  <div class="chat-input">
+    <input type="text" id="chat-q" placeholder="{{예시 질문·지시}}">
+    <button type="button" id="chat-send" class="primary">보내기</button>
+  </div>
+  <div class="status-hint">주고받은 것은 <strong>기록에 함께 남습니다.</strong></div>
+</div>
+<div id="text-modal-backdrop" class="text-modal-backdrop" hidden>
+  <div class="text-modal" role="dialog" aria-modal="true" aria-labelledby="text-modal-title">
+    <div id="text-modal-title" class="text-modal-title"></div>
+    <div id="text-modal-hint" class="status-hint" style="margin:0 0 8px"></div>
+    <textarea id="text-modal-input" rows="3"></textarea>
+    <div class="text-modal-acts"><button type="button" id="text-modal-cancel">취소</button>
+      <button type="button" id="text-modal-ok" class="primary">확인</button></div>
+  </div>
+</div>
+
+<script>
+/* ═══ 뼈대 공통 JS — 도메인 무관. 라우트 계약: /api/status(GET) /api/probe(GET) /api/state(GET) /api/job?id(GET)
+   /api/chat(POST) /api/chat/log(GET) /api/open-folder(GET) + 도메인 라우트. ═══ */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+async function api(method, path, body){
+  const r = await fetch(path, {method, headers: body ? {"Content-Type":"application/json"} : {}, body: body ? JSON.stringify(body) : undefined});
+  let j = {}; try { j = await r.json(); } catch(_e){}
+  return Object.assign({status:r.status}, j);
+}
+const ACTOR = {USER:"사용자", SYSTEM:"시스템", BOT:"AI"};   // 화면·로그에 「액션봇」이라는 내부 용어를 쓰지 않는다 — 사용자에게는 「AI」「AI 대화」
+
+/* ── LLM 세 자리 — 한 출처(VERIFY_ROWS)에서만 그린다. 제품명 그대로: Claude Code CLI · Codex CLI. ── */
+const VERIFY_ROWS = [
+  {key:"작업",     label:"판단·작성", desc:"Claude Code CLI", note:""},
+  {key:"1차 검증", label:"1차 검증",  desc:"Claude Code CLI", note:"판단·작성 작업에 참여하지 않음(따로 부름)"},
+  {key:"2차 검증", label:"2차 검증",  desc:"Codex CLI",       note:"다른 회사 AI"}
+];
+function verifyRows(v){
+  if (!v) return '<p class="msg-info">확인하는 중…</p>';
+  let html = "";
+  for (const def of VERIFY_ROWS){
+    const row = v[def.key] || {};
+    const found = row.found === true, 모름 = row.found == null;
+    const 도는중 = 모름 && /확인하는 중/.test(row.note || "");
+    html += '<div class="plain-row"><span class="plain-label">' + esc(def.label) + '</span>' +
+      '<span class="plain-desc">' + esc(def.desc) + '</span>' +
+      '<span class="status-chip ' + (found ? "st-ok" : (도는중 ? "st-dim" : "st-warn")) + '">' +
+      (found ? "준비됨" : (도는중 ? "확인하는 중…" : (모름 ? "확인 못 함" : "없음"))) + '</span>' +
+      (def.note ? '<span class="row-num">' + esc(def.note) + '</span>' : "") +
+      (row.note ? '<span class="row-num">' + esc(row.note) + '</span>' : "") + '</div>';
+  }
+  return html;
+}
+/* 설치확인 ≠ 작동확인 — 서버가 found:true/false/null(모름) 세 값을 준다. 모름은 통과도 실패도 아니다. */
+function chipRow(label, desc, found, note){
+  const 모름 = found == null;
+  return '<div class="plain-row"><span class="plain-label">' + esc(label) + '</span><span class="plain-desc">' + esc(desc) + '</span>' +
+    '<span class="status-chip ' + (found ? "st-ok" : (모름 ? "st-dim" : "st-warn")) + '">' + (found ? "준비됨" : (모름 ? "확인 못 함" : "없음")) + '</span>' +
+    (note ? '<span class="row-num">' + esc(note) + '</span>' : "") + '</div>';
+}
+
+/* ── 연결 상태 — 끊기면 왼쪽 맨 위 띠 한 줄 + 좌측 블록 흐림. 접힌 블록을 저절로 펼치지 않는다. ── */
+let _failures = 0;
+function setStatusAlert(bad){
+  const bar = $("status-alert"); if (bar) bar.hidden = !bad;
+  const su = $("safe-unknown"); if (su) su.hidden = !bad;
+  document.querySelectorAll("aside.col-left .cat-block").forEach(el => el.classList.toggle("unverified", !!bad));
+  const cb = $("conn-badge"); if (cb){ cb.textContent = bad ? "연결 끊김" : "연결됨"; cb.classList.toggle("badge-warn", !!bad); cb.classList.toggle("badge-ok", !bad); }
+}
+async function loadStatus(live){
+  try {
+    const r = await api("GET", "/api/probe" + (live ? "?live=1" : ""));
+    if (r.status !== 200) throw new Error("status " + r.status);
+    _failures = 0; setStatusAlert(false);
+    $("llm-status").innerHTML = verifyRows(r.llm);                  // {작업:{found,note}, "1차 검증":{...}, "2차 검증":{...}}
+    $("status-list").innerHTML = (r.tools || []).map(t => chipRow(t.label, t.desc, t.found, t.note)).join("") || '<p class="msg-info">등록된 도구 없음</p>';
+    for (const [id, row] of Object.entries(r.kb || {})) { const el = $(id); if (el) el.innerHTML = chipRow(row.label, row.desc, row.found, row.note); }
+    if (r.backup){ $("backup-line").textContent = r.backup.line || ""; $("backup-detail").textContent = r.backup.detail || ""; }
+  } catch(e){ if (++_failures >= 2) setStatusAlert(true); }
+}
+
+/* ── 작업 목록 / 진행 단계 / 로그 ── */
+function renderJobList(items, currentId){
+  const run = items.filter(i => !i.done), done = items.filter(i => i.done);
+  let h = run.map(i => '<div class="plain-row' + (i.id === currentId ? ' is-current' : '') + '"><button type="button" class="link-btn" data-open="' + esc(i.id) + '">' + esc(i.title) + '</button><span class="row-num">' + esc(i.stage || "") + '</span></div>').join("") || '<p class="msg-info">진행 중인 것이 없습니다.</p>';
+  h += '<details class="more-details"><summary>완료 <span class="cat-caption">' + done.length + '건</span></summary>' +
+       done.map(i => '<div class="plain-row"><button type="button" class="link-btn" data-open="' + esc(i.id) + '">' + esc(i.title) + '</button></div>').join("") + '</details>';
+  $("gate-list").innerHTML = h;
+  $("intake-count").textContent = run.length + "건 진행 중";
+}
+function renderStages(stageIdx, restored){
+  [...$("stage-list").children].forEach((li, i) => { li.className = i < stageIdx ? "done" : (i === stageIdx ? "now" : ""); });
+  $("stage-restored").hidden = !restored;
+}
+function audit(msg, role){
+  const li = document.createElement("li");
+  li.textContent = new Date().toLocaleTimeString("ko-KR", {hour:"2-digit", minute:"2-digit"}) + " · " + (role || ACTOR.SYSTEM) + " · " + msg;
+  $("audit-list").prepend(li);
+}
+
+/* ── 작업 폴링 — 재귀 setTimeout + 실패 횟수. 오류를 삼켜 「실행 중」에 영구 정지하지 않는다. ── */
+function pollJob(jobId, onDone, onFail){
+  const POLL_MS = 1200, GIVE_UP_MS = 5000, GIVE_UP_AFTER = Math.ceil(GIVE_UP_MS / POLL_MS);
+  let failures = 0;
+  (async function tick(){
+    let r; try { r = await api("GET", "/api/job?id=" + encodeURIComponent(jobId)); } catch(_e){ r = null; }
+    if (!r || r.status !== 200){ if (++failures < GIVE_UP_AFTER) return setTimeout(tick, POLL_MS); return onFail && onFail("연결이 끊겼습니다"); }
+    if (r.job && r.job.status === "running") return setTimeout(tick, POLL_MS);
+    if (r.job && r.job.status === "done") return onDone && onDone(r.job.result);
+    return onFail && onFail((r.job && r.job.error) || "실패");
+  })();
+}
+
+/* ── 액션봇 — 실행형. needs_confirm 이면 확인창 뒤 confirm:true 로 재전송. FAB 드래그·패널은 머리만 잡음. ── */
+function makeDraggable(el, handle){
+  let sx, sy, ox, oy, on = false, moved = false;
+  const place = (x, y) => { el.style.setProperty("--fx", x + "px"); el.style.setProperty("--fy", y + "px"); el.style.setProperty("--fr", "auto"); el.style.setProperty("--fb", "auto"); };
+  handle.addEventListener("pointerdown", e => { if (e.button !== 0) return; if (handle !== el && e.target.closest("button")) return;
+    const r = el.getBoundingClientRect(); sx = e.clientX; sy = e.clientY; ox = r.left; oy = r.top; moved = false; on = true; el.classList.add("dragging"); handle.setPointerCapture(e.pointerId); });
+  handle.addEventListener("pointermove", e => { if (!on) return; const dx = e.clientX - sx, dy = e.clientY - sy; if (!moved && Math.abs(dx) + Math.abs(dy) < 4) return; moved = true; e.preventDefault(); place(ox + dx, oy + dy); });
+  const stop = e => { if (!on) return; on = false; el.classList.remove("dragging"); try { handle.releasePointerCapture(e.pointerId); } catch(_e){}
+    if (moved){ const eat = ev => { ev.stopPropagation(); ev.preventDefault(); }; handle.addEventListener("click", eat, {capture:true, once:true}); } };
+  handle.addEventListener("pointerup", stop); handle.addEventListener("pointercancel", stop);
+}
+function chatAppend(role, text){ const d = document.createElement("div"); d.className = "chat-msg " + role; d.textContent = text; $("chat-log").appendChild(d); $("chat-log").scrollTop = 1e9; }
+async function chatSend(){
+  const q = $("chat-q").value.trim(); if (!q) return; $("chat-q").value = ""; chatAppend("me", q);
+  let r = await api("POST", "/api/chat", {message:q});
+  if (r.needs_confirm){ if (!confirm(r.message || "이 작업은 되돌리기 어렵습니다. 진행할까요?")) { chatAppend("bot", "취소했습니다."); return; } r = await api("POST", "/api/chat", {message:q, confirm:true}); }
+  chatAppend("bot", r.reply || r.error || "응답 없음");
+  if (r.job) pollJob(r.job, () => { chatAppend("bot", "끝났습니다."); refresh(); }, m => chatAppend("bot", "실패: " + m));
+}
+
+/* ── 부팅 ── */
+/* ── refresh — 상태 계약(uicontract STATUS/STATE)의 렌더러를 여기서 부른다. 새 키를 그리면 여기와 uicontract 를 같이 고친다. ── */
+async function refresh(){
+  const st = await api("GET", "/api/status"); if (st.status !== 200) { setStatusAlert(true); return; }
+  setStatusAlert(false);                                 // 연결은 됐다. 차단(st.blocked)은 안전 체계 배지 + 로그로
+  const sb = $("safe-unknown"); if (sb) { sb.hidden = !st.blocked; sb.textContent = st.blocked ? ("⚠ 차단: " + (st.blocked.code || "")) : "⚠ 연결 끊김"; }
+  const state = await api("GET", "/api/state");
+  const items = Object.entries(state.items || {}).map(([id, it]) => ({id, title: it.title || ("{{작업 단위}} " + id), stage: it.status || "", done: it.status === "done"}));
+  renderJobList(items, state.current || null);
+  $("btn-new-case").disabled = false;
+  const STAGE_INDEX = {"intake": 0};                    // ▼ 도메인: 단계 이름 → 진행 단계 번호 (흐름도·카드와 1:1)
+  const stageIdx = STAGE_INDEX[st.phase] ?? 0;
+  renderStages(stageIdx, false);
+  const hasWork = items.length > 0; $("workspace-gate").hidden = hasWork; $("workspace-body").hidden = !hasWork;
+  let cp = ""; for (const [n, it] of Object.entries(st.items || {})) cp += '<div class="plain-row"><span class="plain-label">' + esc(n) + '</span><span class="plain-desc">' + esc(it.status || "") + (it.score != null ? " · " + it.score + "점" : "") + (it.calls != null ? " · " + it.calls + "회" : "") + "</span></div>";
+  const cpEl = $("chapProg"); if (cpEl) cpEl.innerHTML = cp;           // STATUS_CONTRACT.chapters → 우측 진행 단계 아래
+  const lg = await api("GET", "/api/logs?n=60"); $("audit-list").innerHTML = (lg.logs || []).slice().reverse().map(l => "<li>" + esc((l.ts || "").slice(11, 16)) + " · " + esc(l.actor) + " · " + esc(l.msg) + "</li>").join("");
+  /* ▼ 도메인: renderOutline(state.outline) · renderCites(state.citations) … 계약 표의 렌더러를 여기서 부른다 */
+}
+document.addEventListener("DOMContentLoaded", () => {
+  $("btn-refresh-status").addEventListener("click", () => loadStatus(true));
+  $("chat-open").addEventListener("click", () => { $("chat-panel").hidden = false; });
+  $("chat-close").addEventListener("click", () => { $("chat-panel").hidden = true; });
+  $("chat-send").addEventListener("click", chatSend);
+  $("chat-q").addEventListener("keydown", e => { if (e.key === "Enter") chatSend(); });
+  makeDraggable($("chat-open"), $("chat-open"));
+  makeDraggable($("chat-panel"), $("chat-panel").querySelector(".chat-head"));
+  ["btn-open-setup", "btn-open-setup-side"].forEach(id => $(id).addEventListener("click", () => { const s = $("setup-helper"); s.hidden = false; s.open = true; s.scrollIntoView({behavior:"smooth"}); }));
+  $("btn-open-logs").addEventListener("click", () => api("GET", "/api/open-folder?which=logs"));
+  loadStatus(false); refresh();
+  setInterval(() => loadStatus(false), 30000);
+});
+</script>
+</body>
+</html>
