@@ -150,6 +150,41 @@ def test_reset_path_requires_force_and_backup(tmp_path, monkeypatch):
     assert list((tmp_path / "state_backups").glob("state_before_*.json"))
 
 
+# ───────────────────────────── 3b. 「정의됨 ≠ 호출됨」 — 설계 문서가 «구현했다»고 적은 함수가 실제로 있고, 다른 곳에서 불리는가
+def _doc_funcs():
+    """bom.md·기획안_구현_대조표.md 에 `module.func` 꼴로 적힌 것 전부."""
+    out = set()
+    for name in ("bom.md", "기획안_구현_대조표.md"):
+        p = ROOT / "_개발자료" / "_design" / name
+        if p.exists():
+            out |= set(re.findall(r"`([a-z_][a-z0-9_]*)\.([A-Za-z_][A-Za-z0-9_]*)(?:\(\)?)?`", p.read_text(encoding="utf-8")))
+    return {(m, f) for m, f in out if (APP / (m + ".py")).exists()}
+
+
+@pytest.mark.parametrize("mod,fn", sorted(_doc_funcs()) or [("engine", "status")])
+def test_documented_function_exists_and_is_called(mod, fn):
+    src = (APP / (mod + ".py")).read_text(encoding="utf-8")
+    assert re.search(r"^\s*def\s+%s\s*\(" % re.escape(fn), src, re.M), "%s.%s 정의 없음(문서만 있음)" % (mod, fn)
+    callers = 0
+    for p in list(APP.glob("*.py")) + list((APP / "ui").glob("*.html")):
+        body = p.read_text(encoding="utf-8", errors="ignore")
+        pat = r"(?<![\w.])%s\.%s\s*\(" % (mod, fn) if p.name != mod + ".py" else r"(?<![\w.])%s\s*\(" % fn
+        n = len(re.findall(pat, body)) - (1 if p.name == mod + ".py" else 0)   # 자기 정의 1개 제외
+        callers += max(n, 0)
+    assert callers > 0, "%s.%s 는 정의만 있고 호출부가 없다(만들어 놓고 안 쓰는 코드)" % (mod, fn)
+
+
+def test_second_verifier_is_wired():
+    """LLM 3자리 중 「2차 검증(Codex)」이 화면 칩(설치 확인)만이 아니라 실제 파이프라인에서 불리는가."""
+    src = (APP / "engine.py").read_text(encoding="utf-8")
+    m = re.search(r"providers\s*=\s*\[\s*[\"']codex[\"']", src)
+    assert m, "engine.py 어디에도 providers=['codex', …] 호출이 없다 — 2차 검증이 배선되지 않음"
+    # 그 호출을 담은 함수가 다시 어딘가에서 불리는가
+    head = src[:m.start()]
+    fn = re.findall(r"^\s*def\s+([A-Za-z_]\w*)\s*\(", head, re.M)[-1]
+    assert len(re.findall(r"(?<![\w.])%s\s*\(" % fn, src)) >= 2, "%s 는 정의만 있고 호출되지 않음" % fn
+
+
 # ───────────────────────────── 4. 돌연변이 자가 검사 (이 파일이 진짜 재는지)
 def test_mutation_sanity():
     # 시험이 «항상 통과»하는 헛시험이 아닌지 — 실제 파일을 읽는다는 것을 한 번 확인

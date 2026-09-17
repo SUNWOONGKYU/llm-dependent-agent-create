@@ -19,6 +19,16 @@ class Blocked(Exception):
     """사람 문장으로 된 차단 사유. ui 는 409 로, run.py 는 '차단:' 으로 보여 준다."""
 
 
+# 설정 블록(우측)·사용자 기준(좌측 지식베이스) 필드 — ui_skeleton /api/profile 이 이 목록만 저장한다
+PROFILE_FIELDS = ["sender_name"]            # ▼ 도메인
+PROFILE_REQUIRED = []                       # ▼ 도메인: 비어 있으면 좌측 지식베이스 「기준」 접기를 펼친다
+
+# 작업 단위 패턴 — 둘 중 하나를 고른다(시범 제조에서 드러난 분기, 2026-09-17)
+#   SINGLE: 한 번에 하나(논문처럼 길고 큰 작업). intake 가 이전 상태를 백업 후 초기화한다.
+#   MULTI : 여러 건을 순차 처리하고 이력을 누적(회의록·문서 정리처럼 짧은 작업). intake 는 items 에 항목을 추가하고 state["current"] 만 잠근다.
+WORK_MODE = "SINGLE"                        # ▼ 도메인: "SINGLE" | "MULTI"
+
+
 # ---------------------------------------------------------------- 가명화 이름(재시작 후 복원)
 _NAMES: list[str] = []
 
@@ -41,6 +51,23 @@ def intake(*required, names: list[str] | None = None, profile: dict | None = Non
     if missing:
         raise Blocked("입력 필수 항목 부족: %s" % ", ".join(missing))
     prev = store.load_state()
+    if WORK_MODE == "MULTI":
+        # 이력 누적: 진행 중(current)이 있으면 잠금, 없으면 새 항목을 items 에 추가한다. 이전 항목은 지우지 않는다.
+        cur = prev.get("current")
+        if cur and (prev.get("items") or {}).get(cur, {}).get("status") not in (None, "done", "stalled") and not force:
+            raise Blocked("진행 중인 {{작업 단위}}(%s)이 있습니다. 끝내거나 force=True." % cur)
+        item_id = store.now_iso().replace(":", "").replace("-", "")[:15]
+
+        def _add(st):
+            st.setdefault("items", {})[item_id] = {"status": "pending", "calls": 0, "created": store.now_iso(), **{k: v for k, v in fields.items() if k != "names"}}
+            st["current"] = item_id
+            st["pseudonym_names"] = sorted(set((st.get("pseudonym_names") or []) + list(names or [])))
+            st["profile"] = dict(st.get("profile") or {}, **(profile or {}))
+            st["phase"] = "{{첫 단계 이름}}"
+        st = store.update_state(_add)
+        _NAMES.clear(); _NAMES.extend(st["pseudonym_names"])
+        store.log("시스템", "{{작업 단위}} 추가 — %s" % item_id)
+        return st
     if prev.get("items") and not force:
         raise Blocked("이미 진행 중인 {{작업 단위}}(%d건)이 있습니다. 새로 시작하면 현재 상태가 백업된 뒤 초기화됩니다 — 확인 후 force=True." % len(prev["items"]))
     if prev.get("items"):
@@ -65,12 +92,28 @@ def run_all(progress=None) -> dict:
     st = store.load_state()
     if st.get("blocked"):
         raise Blocked("차단 상태: %s" % st["blocked"]["code"])
-    # for step in STEPS: ... _do_step(step) ... store.update_state(phase=...) ...
-    raise NotImplementedError("▼ 도메인: 단계 함수들을 여기서 순서대로 부른다")
+    # ▼ 도메인: 단계 함수들을 순서대로. 최소 골격 —
+    #   draft = _call_llm(prompt, "draft")            # 작업(Claude)
+    #   v1 = verify_1st(draft["text"], rubric)        # 1차 검증(Claude 별도 호출) → 미달이면 수정 ≤ N회
+    #   v2 = verify_2nd(draft["text"], rubric)        # 2차 검증(Codex) → 결과를 item["verify2"] 에 저장, 화면에 표시
+    #   [사람 승인] → 최종 산출물 → OUT
+    raise NotImplementedError("▼ 도메인: 단계 함수들을 여기서 순서대로 부른다 — verify_1st·verify_2nd 를 반드시 호출한다")
 
 
 def resume() -> dict:
     return run_all()
+
+
+def verify_1st(draft: str, rubric: str) -> dict:
+    """1차 검증 — 작업(초고)을 만든 호출과 **별도 프로세스**의 Claude 가 본다(자기 것을 자기가 통과시키지 않게). 반환 {ok, data:{pass, issues[]}}"""
+    return llm.call_json("\n".join(["너는 검증자다. 작성자가 아니다.", "# 기준\n" + rubric, "# 대상\n" + draft,
+                                     '# 출력 — JSON 하나만: {"pass": true|false, "issues": ["..."]}']), purpose="verify1", timeout=300, providers=["claude"])
+
+
+def verify_2nd(draft: str, rubric: str) -> dict:
+    """2차 검증 — 다른 회사 AI(Codex). 없으면 Claude 로 폴백하되 결과에 provider 를 남긴다. 화면 「2차 검증」 칩은 설치·로그인 확인일 뿐 — 이 함수가 불려야 «실제로 검증됨»이다."""
+    return llm.call_json("\n".join(["You are an independent verifier, not the author.", "# Criteria\n" + rubric, "# Target\n" + draft,
+                                     '# Output — exactly one JSON: {"pass": true|false, "issues": ["..."]}']), purpose="verify2", timeout=300, providers=["codex", "claude"])
 
 
 def _call_llm(prompt: str, purpose: str, timeout: int = 300) -> dict:

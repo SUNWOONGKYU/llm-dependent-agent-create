@@ -1,6 +1,22 @@
-# 에신 CHANGELOG (V1.0 → V3.27)
+# 에신 CHANGELOG
 
 > V4.0 부터는 이 파일에만 적는다. SKILL.md 에는 버전과 한 줄 요약만.
+
+V4.2 (2026-09-17) — 시범품(회의록) V1 정식 검증 79점·High 1건(Codex 2차 검증이 정의만 있고 호출부 0, 매뉴얼은 실제 기능처럼 기술) 반영
+  · templates/test_gates.py: `test_documented_function_exists_and_is_called`(bom·대조표의 module.func 가 존재+호출부 ≥1) · `test_second_verifier_is_wired`(engine 에 providers=["codex"…] 호출 + 그 함수가 불림)
+  · engine_skeleton: `verify_1st`(Claude 별도 호출)·`verify_2nd`(Codex) 훅 + run_all 골격에서 호출 의무
+  · 원칙 5 확장 「정의됨 ≠ 호출됨」 · docs/50 「자기 대조표는 V1 대체 불가」「LLM 3자리의 뜻」 · docs/40 시험 묶음 추가 · phase_gates 6→6b
+
+V4.1 (2026-09-17) — 시범 제조(회의록 정리 에이전트, 별도 Sonnet 세션이 스킬만 보고 제조) 막힌 곳 7건 반영
+  · Phase 0~5 는 막힘 없음. 막힌 곳 전부 Phase 6 templates 단계
+  · gui_skeleton 의 btn-office-save·btn-standards-save·btn-setup-recheck 가 죽은 버튼 → ui_skeleton 에 /api/setup·/api/setup/run·/api/profile(GET/POST) 라우트, gui_skeleton 에 loadSetup/loadProfile/saveProfile 배선
+  · engine_skeleton `WORK_MODE` SINGLE(초기화형)/MULTI(누적형) 분기 + docs/30 표
+  · guard 가드 두 종류(고정 문구형 정규식 / 판단형 = 프롬프트+self_check+승인) 명문화
+  · templates/verify_windows_adapter.ps1 동봉(CLAUDE.md·SKILL §6 이 요구하던 것이 없었음) + docs/40 §3b
+  · smoke_ui buttons_without_handler 가 data-* 버튼을 오탐 → dataset 있으면 핸들러 있음
+  · 원자재 결함(_NUM_RE 날짜 오탐·self_check 형식 미검출)은 에이전트 몫 — 기록만
+
+V4.0 (2026-09-17) — 완전 리모델링. 2,377행 → 지휘 문서 129행 + docs/templates/checklists. 이하 구본 이력(V1.0 → V3.27)
 
 <!-- LLM_DEPENDENT_AGENT_CREATE_SPEC_VERSION: V3.27 -->
 

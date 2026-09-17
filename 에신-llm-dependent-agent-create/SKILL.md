@@ -2,11 +2,13 @@
 name: 에신
 description: "★ 별칭: 에신 (에이전트의 신) ★ LLM 의존형 에이전트 제조 공장 V4 — 요구를 12항목으로 캐내고, mbo-천상으로 목표를 승인받고, 원자재(지정 A / 공개 발굴 B)를 분해·BOM 으로 선별한 뒤, 뼈대 파일(templates/)을 복사해 7대 구성요소(페르소나·목표·LLM·지식베이스·도구·안전 체계·자율 루프)를 조립하고, Phase 7 에서 V1(Claude Teammate Sonnet 5)·V2(Codex, L 규모만) 1회 검증으로 출하한다. 데스크톱형 GUI 는 화면 구성 고정표(좌 페르소나·LLM 3자리·도구·지식베이스 / 우 설정·목록·목표·진행·안전·기록)를 그대로 따른다. mbo-천상 필수(없으면 자동 설치). 사용자가 '에신', '에이전트 만들어', '에이전트 제작', 'llm-dependent-agent-create', '~하는 AI 만들어줘'를 요청할 때 사용. (Claude Code 안에서만 도는 절차는 /skill-create)"
 user-invocable: true
-version: "4.0"
+version: "4.2"
 last_updated: "2026-09-17"
 ---
 
-<!-- LLM_DEPENDENT_AGENT_CREATE_SPEC_VERSION: V4.0 -->
+<!-- LLM_DEPENDENT_AGENT_CREATE_SPEC_VERSION: V4.2 -->
+<!-- V4.2 (2026-09-17) 시범품 V1 검증(79·High 1) 반영 — 「정의됨 ≠ 호출됨」 시험, LLM 3자리 런타임 배선(verify_1st·verify_2nd) 의무, 자기 대조표는 V1 대체 불가 -->
+<!-- V4.1 (2026-09-17) 시범 제조(회의록 정리 에이전트) 막힌 곳 7건 반영 — 설치 도우미·설정·기준 라우트/배선(죽은 버튼 0), WORK_MODE SINGLE/MULTI, 가드 두 종류, verify_windows_adapter.ps1 동봉, smoke 진단 보정. 상세 CHANGELOG -->
 <!-- V4.0 (2026-09-17) 완전 리모델링 — 2,377행 서술형 본문을 「지휘 문서(이 파일) + docs 모듈 + templates + checklists」 구조로 재편. 변경 이력은 CHANGELOG.md. 스킬 자체의 관계도·흐름도는 _개발자료/_design/에신_V4_architecture.svg — 이 파일의 절 번호와 1:1. -->
 
 # 에신 — LLM 의존형 에이전트 제조 공장 (V4.0)
@@ -20,7 +22,7 @@ last_updated: "2026-09-17"
 에신-llm-dependent-agent-create/
 ├─ SKILL.md            ← 지금 이 파일. §3 Phase 표가 전부다
 ├─ docs/               읽는 것 — 00 7요소 · 01 GUI 표준구성 · 10 시동·발굴 · 15 리서치 · 20 설계 규격 · 30 조립 공통 · 31 GUI 트랙 · 32 비GUI/웹 · 40 시험 · 50 검증 · 60 출하·운영
-├─ templates/          복사해서 채우는 것 — 본체 5(store·llm·guard·engine·run _skeleton.py) · GUI 3(gui_skeleton/index.html · ui_skeleton.py · smoke_ui.py) · 시작.bat · CLAUDE.md · uicontract.py · setup_helper.py · 출하_정리.py · test_gates.py · V1_지시서 · V2_지시서 · 양식/(plan·bom·대조표)
+├─ templates/          복사해서 채우는 것 — 본체 5(store·llm·guard·engine·run _skeleton.py) · GUI 3(gui_skeleton/index.html · ui_skeleton.py · smoke_ui.py) · 시작.bat · CLAUDE.md · uicontract.py · setup_helper.py · 출하_정리.py · test_gates.py · verify_windows_adapter.ps1 · V1_지시서 · V2_지시서 · 양식/(plan·bom·대조표)
 ├─ checklists/         넘어갈 조건 — phase_gates · gui_고정표 · v1_v2_대조표
 ├─ _개발자료/_design/            이 스킬의 관계도·흐름도
 └─ CHANGELOG.md        이력
@@ -35,7 +37,7 @@ last_updated: "2026-09-17"
 2. **자기검증 금지** — 만든 사람이 자기 결과를 통과시키지 않는다. 검증자는 Phase 7 에서만 부른다(중간 라운드 없음).
 3. **뼈대 복제** — 데스크톱형 GUI 는 `templates/gui_skeleton/index.html`·`ui_skeleton.py` 를 복사해 `{{ }}` 만 채운다. 블록 이동·삭제·접기 변경 금지. 자리 표시 어휘(접수·작업·사건)는 도메인 사람의 말로 전부 바꾼다.
 4. **LLM 두 자리** — 작업·1차 검증 = Claude Code CLI, 2차 검증 = Codex CLI. 다른 CLI 를 끼워 넣지 않는다. 제작·검증·로컬 런타임은 구독, API 키는 웹사이트형 서버에만.
-5. **미확인 ≠ 통과** — 설치 확인은 작동 확인이 아니다. 판정하지 못한 것을 「이상 없음」으로 그리지 않는다(칩 4값: 준비됨/확인하는 중/확인 못 함/없음).
+5. **미확인 ≠ 통과, 정의됨 ≠ 호출됨** — 설치 확인은 작동 확인이 아니다(칩 4값). 문서에 «구현했다»고 적은 함수는 코드에 있고 다른 곳에서 불려야 한다(시험이 잡는다). LLM 「1차·2차 검증」은 칩이 아니라 `verify_1st`·`verify_2nd` 호출이 있어야 검증이다.
 6. **설계도는 구현과 같아야 출하** — 구현이 설계와 달라지는 순간 SVG·plan 을 고치고, Phase 6 마감에 화면 단계 ↔ 흐름도 1:1 을 대조한다.
 7. **상태를 지우는 경로는 확인 + 백업** — 초기화 전 백업, 단계마다 스냅샷. 검증자 소환 전에도 스냅샷.
 8. **외부 의존은 정확히 2개** — `mbo-천상`(목표·승인·보고, 없으면 자동 설치) · `Codex`(V2, 없으면 Opus 5 Teammate 폴백). 그 외 스킬은 있으면 쓰고 없으면 본문 폴백.

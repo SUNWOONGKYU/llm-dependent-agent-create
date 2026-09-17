@@ -696,7 +696,10 @@ button.group-head .gcount{
         <div class="status-hint" style="margin-top:6px">
           {{규칙이 정하지 않은 값은 사용자가 정한다는 설명}} 값과 <strong>근거</strong>를 함께 적고 [저장]하십시오.
           비워 두면 산출물에 「확인 필요」로 나갑니다 — 지어내지 않습니다.
-          <div id="standards-form"></div>
+          <div id="standards-form" class="form-grid">
+            <!-- ▼ 도메인: 사용자가 정하는 기준 값 + 근거. id = engine.PROFILE_FIELDS 항목, 필수는 PROFILE_REQUIRED -->
+            <div style="grid-column:1/-1"><label for="standards_basis">근거 (어디서 확인했는지)</label><input id="standards_basis"></div>
+          </div>
           <p style="margin:8px 0 0">
             <button type="button" id="btn-standards-save" class="primary">저장</button>
             <span id="standards-out" class="msg-info" aria-live="polite"></span>
@@ -761,7 +764,10 @@ button.group-head .gcount{
         <span class="cat-caption">{{무엇에 찍히는 값인지 — 한 번만}}</span></summary>
       <div class="cat-block">
         <p class="status-hint" id="office-note">{{여기 적은 값이 어디에 쓰이는지}}</p>
-        <div id="office-form" class="form-grid"></div>
+        <div id="office-form" class="form-grid">
+          <!-- ▼ 도메인: input/select 의 id 또는 data-key = engine.PROFILE_FIELDS 항목 -->
+          <div><label for="sender_name">{{예: 발신자 이름}}</label><input id="sender_name"></div>
+        </div>
         <p style="margin:8px 0 0"><button type="button" id="btn-office-save" class="primary">저장</button>
           <span id="office-out" class="msg-info" aria-live="polite"></span></p>
       </div>
@@ -989,6 +995,26 @@ async function chatSend(){
   if (r.job) pollJob(r.job, () => { chatAppend("bot", "끝났습니다."); refresh(); }, m => chatAppend("bot", "실패: " + m));
 }
 
+/* ── 설치 도우미(LLM 두 자리 설치·로그인) · 설정 블록 · 사용자 기준 — 뼈대가 배선한다. 죽은 버튼을 두지 않는다. ── */
+async function loadSetup(){
+  const d = await api("GET", "/api/setup");
+  $("setup-must").innerHTML = (d["필수"] || []).map(r => '<div class="plain-row"><span class="plain-label">' + esc(r.title) + '</span><span class="plain-desc">' + esc(r.why) + '</span>' +
+    '<span class="status-chip ' + (r.done === true ? "st-ok" : (r.done === false ? "st-warn" : "st-dim")) + '">' + (r.done === true ? "완료" : (r.done === false ? "필요" : "확인 못 함")) + '</span>' +
+    '<button type="button" data-setup-key="' + esc(r.key) + '" class="link-btn">' + esc(r.title) + '</button></div>').join("");
+  $("setup-note").textContent = d["다됐나"] === true ? "모두 준비됐습니다." : "위에서부터 순서대로 눌러 진행하십시오.";
+  $("setup-must").querySelectorAll("[data-setup-key]").forEach(b => b.addEventListener("click", async () => { const r = await api("POST", "/api/setup/run", {key: b.dataset.setupKey}); $("setup-out").textContent = r.did || r.error || ""; }));
+}
+function formValues(rootId){ const o = {}; $(rootId).querySelectorAll("input,select,textarea").forEach(el => { if (el.id) o[el.dataset.key || el.id] = el.type === "checkbox" ? el.checked : el.value; }); return o; }
+async function loadProfile(){
+  const r = await api("GET", "/api/profile"); if (r.status !== 200) return;
+  const p = r.profile || {};
+  ["office-form", "standards-form"].forEach(id => $(id).querySelectorAll("input,select,textarea").forEach(el => { const k = el.dataset.key || el.id; if (k in p && el.value === "") el.value = p[k]; }));
+  const req = r.required || []; const empty = req.filter(k => !p[k] && p[k] !== 0);
+  $("standards-summary").textContent = empty.length ? ("비어 있음 " + empty.length + "/" + req.length) : (req.length ? "채움 " + req.length + "/" + req.length : "");
+  if (empty.length) { $("fold-standards").open = true; $("fold-kb").open = true; }   // 코드는 «열기»만 한다
+}
+async function saveProfile(rootId, outId){ const r = await api("POST", "/api/profile", formValues(rootId)); $(outId).textContent = r.ok ? "저장했습니다." : (r.error || "저장 실패"); if (r.ok) { audit("설정 저장", ACTOR.USER); loadProfile(); } }
+
 /* ── 부팅 ── */
 /* ── refresh — 상태 계약(uicontract STATUS/STATE)의 렌더러를 여기서 부른다. 새 키를 그리면 여기와 uicontract 를 같이 고친다. ── */
 async function refresh(){
@@ -1016,7 +1042,11 @@ document.addEventListener("DOMContentLoaded", () => {
   $("chat-q").addEventListener("keydown", e => { if (e.key === "Enter") chatSend(); });
   makeDraggable($("chat-open"), $("chat-open"));
   makeDraggable($("chat-panel"), $("chat-panel").querySelector(".chat-head"));
-  ["btn-open-setup", "btn-open-setup-side"].forEach(id => $(id).addEventListener("click", () => { const s = $("setup-helper"); s.hidden = false; s.open = true; s.scrollIntoView({behavior:"smooth"}); }));
+  ["btn-open-setup", "btn-open-setup-side"].forEach(id => $(id).addEventListener("click", () => { const s = $("setup-helper"); s.hidden = false; s.open = true; s.scrollIntoView({behavior:"smooth"}); loadSetup(); }));
+  $("btn-setup-recheck").addEventListener("click", loadSetup);
+  $("btn-office-save").addEventListener("click", () => saveProfile("office-form", "office-out"));
+  $("btn-standards-save").addEventListener("click", () => saveProfile("standards-form", "standards-out"));
+  loadProfile();
   $("btn-open-logs").addEventListener("click", () => api("GET", "/api/open-folder?which=logs"));
   loadStatus(false); refresh();
   setInterval(() => loadStatus(false), 30000);

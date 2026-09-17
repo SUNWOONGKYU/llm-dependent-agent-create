@@ -6,7 +6,7 @@
 경로 탈출 차단, 덮어쓰기 금지, 조용한 종료, favicon 204, 종료 안내) — 도메인 무관 부분만 옮김.
 
 라우트 계약(화면 뼈대 index.html 이 부른다): GET / · /api/status · /api/probe[?live=1] · /api/state · /api/job?id · /api/logs?n · /api/chat/log
-  · /api/open-folder?which=output|logs|backups · /api/manual   POST /api/chat · /api/upload · (도메인 라우트)
+  · /api/open-folder?which=output|logs|backups · /api/manual · /api/setup · /api/profile   POST /api/chat · /api/upload · /api/setup/run · /api/profile · (도메인 라우트)
 환경변수: UI_ALLOW_MULTI=1(다중 인스턴스 허용) · NO_BROWSER=1(탭 자동 열기 끔)
 """
 from __future__ import annotations
@@ -20,7 +20,7 @@ sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 BASE = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE))
-import store, llm, engine  # noqa: E402   ▼ 도메인: 필요한 모듈 추가
+import store, llm, engine, setup_helper  # noqa: E402   ▼ 도메인: 필요한 모듈 추가
 
 UI_DIR = BASE / "ui"
 UPLOAD_DIR = BASE / "uploads"; UPLOAD_DIR.mkdir(exist_ok=True)
@@ -297,6 +297,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if u.path == "/api/manual":
             p = BASE.parent / "사용자 매뉴얼(설치 및 사용법).html"
             return self._send(200, p.read_bytes(), "text/html; charset=utf-8") if p.exists() else self._json(404, {"error": "매뉴얼 없음"})
+        if u.path == "/api/setup":                                   # 설치 도우미 상태(LLM 두 자리 설치·로그인)
+            return self._json(200, setup_helper.상태(_PROBE.get("cli") or llm.probe(live=False)))
+        if u.path == "/api/profile":                                 # 설정 블록(우측) + 사용자 기준(좌측 지식베이스) 값
+            return self._json(200, {"ok": True, "profile": dict(store.load_config("profile.json", {}), **(store.load_state().get("profile") or {})), "required": getattr(engine, "PROFILE_REQUIRED", [])})
         # ▼ 도메인 GET 라우트
         return self._json(404, {"ok": False, "error": "no route"})
 
@@ -321,6 +325,15 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 _CHAT_LOG.append({"q": data.get("message", ""), "a": res.get("reply", ""), "ts": store.now_iso()})
                 store.log("AI", (res.get("reply") or "")[:80], action=res.get("action"))
                 return self._json(200, {"ok": True, **res})
+            if u.path == "/api/setup/run":                           # 설치 도우미 단추 — 표에 박힌 명령만
+                return self._json(200, setup_helper.실행(str(data.get("key", ""))))
+            if u.path == "/api/profile":                             # 설정·사용자 기준 저장 (state.profile + config/profile.json)
+                allowed = set(getattr(engine, "PROFILE_FIELDS", [])) or set(data.keys())
+                upd = {k: v for k, v in data.items() if k in allowed}
+                store.update_state(lambda s: s.setdefault("profile", {}).update(upd))
+                cfg = dict(store.load_config("profile.json", {})); cfg.update(upd); store.save_config("profile.json", cfg)
+                store.log("사용자", "설정 저장: %s" % ", ".join(sorted(upd)))
+                return self._json(200, {"ok": True, "profile": cfg})
             # ▼ 도메인 POST 라우트 — 상태를 바꾸는 것은 _job(...) 으로, 되돌리기 어려운 것은 needs_confirm 관문
             return self._json(404, {"ok": False, "error": "no route"})
         except Busy:

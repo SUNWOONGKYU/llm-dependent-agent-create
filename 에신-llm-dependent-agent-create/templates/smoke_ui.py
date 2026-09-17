@@ -31,11 +31,11 @@ async def main():
                 out["no_actionbot_word"] = await pg.evaluate("!document.body.innerText.includes('액션봇')")
                 await pg.click("#fold-persona summary"); out["persona_open"] = await pg.evaluate("document.getElementById('fold-persona').open")
                 await pg.click("#fold-safe summary"); out["safe_rows"] = await pg.evaluate("[...document.querySelectorAll('#fold-safe .plain-label')].map(e=>e.textContent)")
-                await pg.click("#btn-new-case"); out["workspace_shown"] = await pg.evaluate("!document.getElementById('workspace-body').hidden")
+                await pg.click("#btn-new-case"); await pg.wait_for_timeout(400); out["workspace_shown"] = await pg.evaluate("!document.getElementById('workspace-body').hidden")
                 await pg.click("#chat-open"); out["chat_open"] = await pg.evaluate("!document.getElementById('chat-panel').hidden")
                 await pg.click("#chat-close")
                 await pg.click("#btn-open-setup-side"); out["setup_open"] = await pg.evaluate("!document.getElementById('setup-helper').hidden")
-                out["buttons_without_handler"] = await pg.evaluate("[...document.querySelectorAll('button')].filter(b=>!b.onclick && !b.id && !b.dataset.ch && !b.dataset.open && !b.closest('summary')).map(b=>b.textContent.trim()).slice(0,10)")
+                out["buttons_without_handler"] = await pg.evaluate("[...document.querySelectorAll('button')].filter(b=>!b.onclick && !b.id && Object.keys(b.dataset).length===0 && !b.closest('summary')).map(b=>b.textContent.trim()).slice(0,10)")
                 await pg.click("#fold-persona summary"); await pg.click("#fold-safe summary")
             await pg.screenshot(path=os.path.join(OUT, "ui_%s.png" % scheme))
             out["console_errors_" + scheme] = [e for e in errs if "favicon" not in e]
