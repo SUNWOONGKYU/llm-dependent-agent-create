@@ -1044,6 +1044,7 @@ document.addEventListener("DOMContentLoaded", () => {
   makeDraggable($("chat-panel"), $("chat-panel").querySelector(".chat-head"));
   ["btn-open-setup", "btn-open-setup-side"].forEach(id => $(id).addEventListener("click", () => { const s = $("setup-helper"); s.hidden = false; s.open = true; s.scrollIntoView({behavior:"smooth"}); loadSetup(); }));
   $("btn-setup-recheck").addEventListener("click", loadSetup);
+  // [+ 새 시작] 은 화면 토글뿐(서버 호출 없음). 실제 시작은 가운데 단계 1 카드의 제출 버튼이 도메인 POST 라우트를 부른다.
   $("btn-new-case").addEventListener("click", () => { $("workspace-gate").hidden = true; $("workspace-body").hidden = false; const f = $("workspace-body").querySelector("input,textarea,select"); if (f) f.focus(); $("main-content").scrollIntoView({behavior: "smooth"}); });
   $("btn-office-save").addEventListener("click", () => saveProfile("office-form", "office-out"));
   $("btn-standards-save").addEventListener("click", () => saveProfile("standards-form", "standards-out"));

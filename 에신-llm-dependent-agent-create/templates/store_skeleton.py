@@ -126,25 +126,30 @@ def backup_state(tag: str = "manual") -> Path:
     return dst
 
 
+def _save_locked(st: dict) -> None:
+    """잠금을 잡은 뒤 부르는 저장 본체."""
+    # 단계가 바뀔 때마다 직전 상태를 스냅샷 — 덮어쓰기 사고(2026-09-17) 복구용. 재시작 직후에는 파일의 phase 를 기준으로 삼는다.
+    if STATE_PATH.exists():
+        if _PHASE_MARK["v"] is None:
+            _PHASE_MARK["v"] = (_read_json(STATE_PATH, {}) or {}).get("phase")
+        if _PHASE_MARK["v"] is not None and st.get("phase") != _PHASE_MARK["v"]:
+            backup_state("phase_%s" % _PHASE_MARK["v"])
+    _PHASE_MARK["v"] = st.get("phase")
+    st["updated"] = now_iso()
+    _atomic_write_json(STATE_PATH, st)
+
+
 def save_state(st: dict) -> None:
     with _STATE_LOCK, _FileLock(STATE_PATH):
-        # 단계가 바뀔 때마다 직전 상태를 스냅샷 — 덮어쓰기 사고(2026-09-17) 복구용. 재시작 직후에는 파일의 phase 를 기준으로 삼는다.
-        if STATE_PATH.exists():
-            if _PHASE_MARK["v"] is None:
-                _PHASE_MARK["v"] = (_read_json(STATE_PATH, {}) or {}).get("phase")
-            if _PHASE_MARK["v"] is not None and st.get("phase") != _PHASE_MARK["v"]:
-                backup_state("phase_%s" % _PHASE_MARK["v"])
-        _PHASE_MARK["v"] = st.get("phase")
-        st["updated"] = now_iso()
-        _atomic_write_json(STATE_PATH, st)
+        _save_locked(st)
 
 
 def update_state(fn) -> dict:
-    """fn(state) -> None. 읽기-수정-쓰기를 한 락 안에서."""
-    with _STATE_LOCK:
+    """fn(state) -> None. 읽기-수정-쓰기 전체를 프로세스 락 + 파일 잠금 안에서(UI 서버·run.py 동시 실행 시 lost update 방지)."""
+    with _STATE_LOCK, _FileLock(STATE_PATH):
         st = load_state()
         fn(st)
-        save_state(st)
+        _save_locked(st)
         return st
 
 
