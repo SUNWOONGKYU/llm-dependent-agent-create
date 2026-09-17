@@ -9,7 +9,7 @@
 <text x="70" y="138" font-size="13" font-weight="700" fill="#1f2a44">외부 의존 (정확히 2개)</text>
 <text x="70" y="156" font-size="11.2" fill="#334155">mbo-천상 (공개명 mbo-skill) — 필수. Phase 0-0 자동 설치·검증</text>
 <text x="70" y="171" font-size="11.2" fill="#334155">  Phase 2 목표서·승인 / Phase 8 /mbo report 가 여기서 나온다</text>
-<text x="70" y="186" font-size="11.2" fill="#334155">Codex CLI (gpt-5.6-terra) — V2 교차 검증. 없으면 Opus 5 Teammate 폴백</text>
+<text x="70" y="186" font-size="11.2" fill="#334155">Codex CLI (gpt-5.6-terra 고정) — V2 교차 검증. 없으면 Opus 5 Teammate 폴백</text>
 <text x="70" y="201" font-size="11.2" fill="#334155">그 외 스킬(diagram·5times…)은 선택 보조 — 없으면 본문 폴백</text>
 <rect x="460" y="120" width="380" height="118" rx="6" fill="#eef3ff" stroke="#1f2a44" stroke-width="1.4"/>
 <text x="470" y="138" font-size="13" font-weight="700" fill="#1f2a44">검증 편제 (Phase 7 에서만 소환)</text>
@@ -27,15 +27,16 @@
 <text x="70" y="466" font-size="11.2" fill="#334155">00 에이전트 7대 구성요소 상세</text>
 <text x="70" y="481" font-size="11.2" fill="#334155">01 GUI 표준 구성 템플릿(공증 분석)</text>
 <text x="70" y="496" font-size="11.2" fill="#334155">10 요구 발굴 12항목 · 발굴 2경로</text>
-<text x="70" y="511" font-size="11.2" fill="#334155">20 설계 산출물 규격 + 갱신 규정</text>
-<text x="70" y="526" font-size="11.2" fill="#334155">    (plan · 관계도/흐름도 SVG · bom ·</text>
-<text x="70" y="541" font-size="11.2" fill="#334155">     기획안_구현_대조표)</text>
-<text x="70" y="556" font-size="11.2" fill="#334155">30 조립 공통(폴더·헌법·SSOT·계약)</text>
-<text x="70" y="571" font-size="11.2" fill="#334155">31 조립 GUI 트랙(고정표·어휘·라우트)</text>
-<text x="70" y="586" font-size="11.2" fill="#334155">32 조립 비GUI 트랙 / 웹사이트형</text>
-<text x="70" y="601" font-size="11.2" fill="#334155">40 시험 규격(최소 묶음·돌연변이)</text>
-<text x="70" y="616" font-size="11.2" fill="#334155">50 검증 7-5 + V1/V2 지시서</text>
-<text x="70" y="631" font-size="11.2" fill="#334155">60 운영 루프 + 수리계약서</text>
+<text x="70" y="511" font-size="11.2" fill="#334155">15 도메인 리서치(경로 B 만)</text>
+<text x="70" y="526" font-size="11.2" fill="#334155">20 설계 산출물 규격 + 갱신 규정</text>
+<text x="70" y="541" font-size="11.2" fill="#334155">    (plan · 관계도/흐름도 SVG · bom ·</text>
+<text x="70" y="556" font-size="11.2" fill="#334155">     기획안_구현_대조표)</text>
+<text x="70" y="571" font-size="11.2" fill="#334155">30 조립 공통(폴더·헌법·SSOT·계약)</text>
+<text x="70" y="586" font-size="11.2" fill="#334155">31 조립 GUI 트랙(고정표·어휘·라우트)</text>
+<text x="70" y="601" font-size="11.2" fill="#334155">32 조립 비GUI 트랙 / 웹사이트형</text>
+<text x="70" y="616" font-size="11.2" fill="#334155">40 시험 규격(최소 묶음·돌연변이)</text>
+<text x="70" y="631" font-size="11.2" fill="#334155">50 검증 7-5 + V1/V2 지시서</text>
+<text x="70" y="646" font-size="11.2" fill="#334155">60 운영 루프 + 수리계약서</text>
 <rect x="340" y="430" width="250" height="250" rx="6" fill="#f1f8e9" stroke="#1f2a44" stroke-width="1.4"/>
 <text x="350" y="448" font-size="13" font-weight="700" fill="#1f2a44">templates/ (복사해서 채우는 것)</text>
 <text x="350" y="466" font-size="11.2" fill="#334155">gui_skeleton/index.html  ← 공증 뼈대</text>
@@ -122,55 +123,64 @@
 <text x="930" y="464" font-size="11.2" fill="#334155">종합은 작성자, 검증자 없음. ⛔ PO 「이 깊이면 OK」 1회. 파일: _개발자료/_design/phase_2.5_research_{날짜}.md</text>
 <line x1="1225.0" y1="487" x2="1225.0" y2="497" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
 <rect x="920" y="497" width="610" height="74" rx="6" fill="#ffffff" stroke="#1f2a44" stroke-width="1.4"/>
-<text x="930" y="515" font-size="13" font-weight="700" fill="#1f2a44">Phase 3 발굴 → Phase 4 BOM</text>
+<text x="930" y="515" font-size="13" font-weight="700" fill="#1f2a44">Phase 3 발굴</text>
 <text x="930" y="533" font-size="11.2" fill="#334155">A: 원자재를 벤치마크 입고 카드로 분해 / B: 공개 저장소·OSS·HF·사내 자산 카탈로그</text>
-<text x="930" y="548" font-size="11.2" fill="#334155">라이선스 게이트(PO 소유·LICENSE·불명은 패턴만) → BOM 5분류 🟢🟡🔴🏭🔵 · SOURCE_REUSE_LOG</text>
+<text x="930" y="548" font-size="11.2" fill="#334155">라이선스 게이트(PO 소유·LICENSE·불명은 패턴만) → 후보 ≥3 또는 🏭 선언</text>
 <line x1="1225.0" y1="571" x2="1225.0" y2="581" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
-<rect x="920" y="581" width="610" height="60" rx="6" fill="#ffffff" stroke="#1f2a44" stroke-width="1.4"/>
-<text x="930" y="599" font-size="13" font-weight="700" fill="#1f2a44">Phase 5 자체 점검 1회 (검증자 없음)</text>
-<text x="930" y="617" font-size="11.2" fill="#334155">5A 루브릭 셀프 채점 → _개발자료/_design/phase5_selfcheck.md · 5B 진단·해체는 M·L 만 · 80 미만이면 PO 보고</text>
-<line x1="1225.0" y1="641" x2="1225.0" y2="651" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
-<rect x="920" y="651" width="610" height="150" rx="6" fill="#f1f8e9" stroke="#1f2a44" stroke-width="1.4"/>
-<text x="930" y="669" font-size="13" font-weight="700" fill="#1f2a44">Phase 6 조립</text>
-<text x="930" y="687" font-size="11.2" fill="#334155">공통(docs/30): 폴더 표준 · CLAUDE.md 템플릿(헌법+함정+명령) · skills/*.md SSOT · store/engine/llm(두 자리) · guard · uicontract · 최소 시험</text>
-<text x="930" y="702" font-size="11.2" fill="#334155">◇ 트랙 분기</text>
-<text x="930" y="717" font-size="11.2" fill="#334155">  GUI 트랙(docs/31): gui_skeleton 복사 → {{ }} 채움 → 도메인 어휘 교체 → 고정표 자기 대조 → ui.py 라우트 계약 → 시작.bat 실기동</text>
-<text x="930" y="732" font-size="11.2" fill="#334155">  비GUI 트랙(docs/32): run.py + 명령 4개 · 웹사이트형: 페이지 = UI(7요소·안전 요건만)</text>
-<text x="930" y="747" font-size="11.2" fill="#334155">설계도 갱신 규정: 구현이 설계와 달라지는 순간 SVG·plan 수정, 마감 때 화면 단계 ↔ 흐름도 1:1 대조</text>
-<text x="930" y="762" font-size="11.2" fill="#334155">6b 시운전 1회(약식·샘플 모드) — KPI 사용자 여정 증명용. 결함은 고치되 재실행은 여정이 끊겼을 때만</text>
-<text x="930" y="777" font-size="11.2" fill="#334155">게이트(checklists/phase_gates): 산출물 파일 전부 존재 + 시험 하한 + 자체 대조표 O</text>
-<polygon points="1660,683.0 1735.0,711 1660,739.0 1585.0,711" fill="#fff7d6" stroke="#8a6d00" stroke-width="1.4"/>
-<text x="1660" y="707" font-size="11.5" text-anchor="middle" fill="#1f2a44">GUI 트랙?</text>
-<line x1="1530" y1="711" x2="1585" y2="711" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
-<text x="1745" y="703" font-size="11" font-weight="400" fill="#334155" text-anchor="start">예 → docs/31 + gui_skeleton</text>
-<text x="1745" y="719" font-size="11" font-weight="400" fill="#334155" text-anchor="start">아니오 → docs/32</text>
-<line x1="1225.0" y1="801" x2="1225.0" y2="811" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
-<rect x="920" y="811" width="610" height="132" rx="6" fill="#fce4ec" stroke="#1f2a44" stroke-width="1.4"/>
-<text x="930" y="829" font-size="13" font-weight="700" fill="#1f2a44">Phase 7 출하 검사 🔍 — 검증자를 부르는 유일한 곳</text>
-<text x="930" y="847" font-size="11.2" fill="#334155">0) 작성자 스냅샷 _개발자료/_qc/pre_verify_snapshot/ → V1 소환(templates/V1_지시서: 상태 변경 금지·읽기전용)</text>
-<text x="930" y="862" font-size="11.2" fill="#334155">1) V1 1회: 4단 QC(정적·동적·클릭·가드 시뮬) + 6축 100점 + 화면 고정표 대조 + SVG↔화면 1:1 + 시작.bat 그대로 기동</text>
-<text x="930" y="877" font-size="11.2" fill="#334155">◇ 합격선: 총점 ≥95 AND Critical·High 0 AND 4단 전항 O AND 사용자 여정 KPI → 불합격이면 수정 → 그 항목만 이진 재확인</text>
-<text x="930" y="892" font-size="11.2" fill="#334155">◇ 규모 L? → V2 1회(Codex terra, 폴백 Opus Teammate) 같은 양식 → |V1−V2|>3 이면 V2 결함 수정·항목 재확인</text>
-<text x="930" y="907" font-size="11.2" fill="#334155">S·M 은 V1 로 출하. V1 없이 출하 금지, L 은 V2 도 있어야 출하</text>
-<polygon points="1660,855.0 1735.0,883 1660,911.0 1585.0,883" fill="#fff7d6" stroke="#8a6d00" stroke-width="1.4"/>
-<text x="1660" y="879" font-size="11.5" text-anchor="middle" fill="#1f2a44">합격?</text>
-<line x1="1530" y1="883" x2="1585" y2="883" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
-<text x="1745" y="875" font-size="11" font-weight="400" fill="#334155" text-anchor="start">아니오 → 수정 → 항목만 이진 재확인</text>
-<text x="1745" y="891" font-size="11" font-weight="400" fill="#334155" text-anchor="start">(전체 재라운드 없음)</text>
-<polygon points="1660,933.0 1735.0,958 1660,983.0 1585.0,958" fill="#eef3ff" stroke="#8a6d00" stroke-width="1.4"/>
-<text x="1660" y="954" font-size="11.5" text-anchor="middle" fill="#1f2a44">L 규모?</text>
-<text x="1745" y="953" font-size="11" font-weight="400" fill="#334155" text-anchor="start">예 → V2 1회</text>
-<text x="1745" y="969" font-size="11" font-weight="400" fill="#334155" text-anchor="start">아니오 → Phase 8</text>
-<line x1="1225.0" y1="943" x2="1225.0" y2="953" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
-<rect x="920" y="953" width="610" height="84" rx="6" fill="#fff3e0" stroke="#1f2a44" stroke-width="1.4"/>
-<text x="930" y="971" font-size="13" font-weight="700" fill="#1f2a44">Phase 8 자산화·출하</text>
-<text x="930" y="989" font-size="11.2" fill="#334155">출하_정리.py(시제 데이터·_scratch 삭제) → 등재(자산-등재.md) → CLAUDE.md 헌법 확인 → 출하 보고서(_개발자료/_qc/출하_보고서.md: V1/V2 점수·4단·KPI)</text>
-<text x="930" y="1004" font-size="11.2" fill="#334155">→ /mbo-천상 report(공개 /mbo report) → 학생 배포 시 _개발자료 분리 zip</text>
-<line x1="1225.0" y1="1037" x2="1225.0" y2="1047" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
-<rect x="920" y="1047" width="610" height="70" rx="6" fill="#ffffff" stroke="#1f2a44" stroke-width="1.4"/>
-<text x="930" y="1065" font-size="13" font-weight="700" fill="#1f2a44">Phase 9 운영·개선 루프</text>
-<text x="930" y="1083" font-size="11.2" fill="#334155">logs·history 트리거(상한 도달 누적 · 차단 반복 · 30일 사용 0) → 수리계약서(항목·수리·대조·이진 확인) → 회귀 깊이 표로 Phase 6/4/2/0 복귀</text>
-<path d="M 1530 1082 L 1590 1082 L 1590 160 L 1560 160" fill="none" stroke="#1f2a44" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#ah)"/>
+<rect x="920" y="581" width="610" height="74" rx="6" fill="#ffffff" stroke="#1f2a44" stroke-width="1.4"/>
+<text x="930" y="599" font-size="13" font-weight="700" fill="#1f2a44">Phase 4 BOM</text>
+<text x="930" y="617" font-size="11.2" fill="#334155">5대 KPI 채점 → 부품 분해 → 안전성 진단 → 5분류 🟢🟡🔴🏭🔵</text>
+<text x="930" y="632" font-size="11.2" fill="#334155">산출물: bom.md · SOURCE_REUSE_LOG.md · THIRD_PARTY_NOTICES.md · 게이트: 🔴 분리 완료</text>
+<line x1="1225.0" y1="655" x2="1225.0" y2="665" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
+<rect x="920" y="665" width="610" height="60" rx="6" fill="#ffffff" stroke="#1f2a44" stroke-width="1.4"/>
+<text x="930" y="683" font-size="13" font-weight="700" fill="#1f2a44">Phase 5 자체 점검 1회 (검증자 없음)</text>
+<text x="930" y="701" font-size="11.2" fill="#334155">5A 루브릭 셀프 채점 → _개발자료/_design/phase5_selfcheck.md · 5B 진단·해체는 M·L 만 · 80 미만이면 PO 보고</text>
+<line x1="1225.0" y1="725" x2="1225.0" y2="735" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
+<rect x="920" y="735" width="610" height="135" rx="6" fill="#f1f8e9" stroke="#1f2a44" stroke-width="1.4"/>
+<text x="930" y="753" font-size="13" font-weight="700" fill="#1f2a44">Phase 6 조립</text>
+<text x="930" y="771" font-size="11.2" fill="#334155">공통(docs/30): 폴더 표준 · CLAUDE.md 템플릿(헌법+함정+명령) · skills/*.md SSOT · store/engine/llm(두 자리) · guard · uicontract · 최소 시험</text>
+<text x="930" y="786" font-size="11.2" fill="#334155">◇ 트랙 분기</text>
+<text x="930" y="801" font-size="11.2" fill="#334155">  GUI 트랙(docs/31): gui_skeleton 복사 → {{ }} 채움 → 도메인 어휘 교체 → 고정표 자기 대조 → ui.py 라우트 계약 → 시작.bat 실기동</text>
+<text x="930" y="816" font-size="11.2" fill="#334155">  비GUI 트랙(docs/32): run.py + 명령 4개 · 웹사이트형: 페이지 = UI(7요소·안전 요건만)</text>
+<text x="930" y="831" font-size="11.2" fill="#334155">설계도 갱신 규정: 구현이 설계와 달라지는 순간 SVG·plan 수정, 마감 때 화면 단계 ↔ 흐름도 1:1 대조</text>
+<text x="930" y="846" font-size="11.2" fill="#334155">게이트(checklists/phase_gates): 산출물 파일 전부 존재 + 시험 하한 + 자체 대조표 O</text>
+<polygon points="1660,767.0 1735.0,795 1660,823.0 1585.0,795" fill="#fff7d6" stroke="#8a6d00" stroke-width="1.4"/>
+<text x="1660" y="791" font-size="11.5" text-anchor="middle" fill="#1f2a44">GUI 트랙?</text>
+<line x1="1530" y1="795" x2="1585" y2="795" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
+<text x="1745" y="787" font-size="11" font-weight="400" fill="#334155" text-anchor="start">예 → docs/31 + gui_skeleton</text>
+<text x="1745" y="803" font-size="11" font-weight="400" fill="#334155" text-anchor="start">아니오 → docs/32</text>
+<line x1="1225.0" y1="870" x2="1225.0" y2="880" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
+<rect x="920" y="880" width="610" height="74" rx="6" fill="#ffffff" stroke="#1f2a44" stroke-width="1.4"/>
+<text x="930" y="898" font-size="13" font-weight="700" fill="#1f2a44">Phase 6b 시운전</text>
+<text x="930" y="916" font-size="11.2" fill="#334155">사용자 여정 1회(약식·샘플 모드) — KPI 사용자 여정 증명용</text>
+<text x="930" y="931" font-size="11.2" fill="#334155">결함은 고치되 재실행은 여정이 끊겼을 때만 · 게이트: 여정 완주 증거</text>
+<line x1="1225.0" y1="954" x2="1225.0" y2="964" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
+<rect x="920" y="964" width="610" height="132" rx="6" fill="#fce4ec" stroke="#1f2a44" stroke-width="1.4"/>
+<text x="930" y="982" font-size="13" font-weight="700" fill="#1f2a44">Phase 7 출하 검사 🔍 — 검증자를 부르는 유일한 곳</text>
+<text x="930" y="1000" font-size="11.2" fill="#334155">0) 작성자 스냅샷 _개발자료/_qc/pre_verify_snapshot/ → V1 소환(templates/V1_지시서: 상태 변경 금지·읽기전용)</text>
+<text x="930" y="1015" font-size="11.2" fill="#334155">1) V1 1회: 4단 QC(정적·동적·클릭·가드 시뮬) + 6축 100점 + 화면 고정표 대조 + SVG↔화면 1:1 + 시작.bat 그대로 기동</text>
+<text x="930" y="1030" font-size="11.2" fill="#334155">◇ 합격선: 총점 ≥95 AND Critical·High 0 AND 4단 전항 O AND 사용자 여정 KPI → 불합격이면 수정 → 그 항목만 이진 재확인</text>
+<text x="930" y="1045" font-size="11.2" fill="#334155">◇ 규모 L? → V2 1회(Codex terra 고정, 폴백 Opus Teammate) 같은 양식 → |V1−V2|>3 이면 V2 결함 수정·항목 재확인</text>
+<text x="930" y="1060" font-size="11.2" fill="#334155">S·M 은 V1 로 출하. V1 없이 출하 금지, L 은 V2 도 있어야 출하</text>
+<polygon points="1660,1008.0 1735.0,1036 1660,1064.0 1585.0,1036" fill="#fff7d6" stroke="#8a6d00" stroke-width="1.4"/>
+<text x="1660" y="1032" font-size="11.5" text-anchor="middle" fill="#1f2a44">합격?</text>
+<line x1="1530" y1="1036" x2="1585" y2="1036" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
+<text x="1745" y="1028" font-size="11" font-weight="400" fill="#334155" text-anchor="start">아니오 → 수정 → 항목만 이진 재확인</text>
+<text x="1745" y="1044" font-size="11" font-weight="400" fill="#334155" text-anchor="start">(전체 재라운드 없음)</text>
+<polygon points="1660,1086.0 1745.0,1111 1660,1136.0 1585.0,1111" fill="#eef3ff" stroke="#8a6d00" stroke-width="1.4"/>
+<text x="1660" y="1107" font-size="11.5" text-anchor="middle" fill="#1f2a44">L 규모?</text>
+<text x="1745" y="1106" font-size="11" font-weight="400" fill="#334155" text-anchor="start">예 → V2 1회</text>
+<text x="1745" y="1122" font-size="11" font-weight="400" fill="#334155" text-anchor="start">아니오 → Phase 8</text>
+<line x1="1225.0" y1="1096" x2="1225.0" y2="1106" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
+<rect x="920" y="1106" width="610" height="84" rx="6" fill="#fff3e0" stroke="#1f2a44" stroke-width="1.4"/>
+<text x="930" y="1124" font-size="13" font-weight="700" fill="#1f2a44">Phase 8 자산화·출하</text>
+<text x="930" y="1142" font-size="11.2" fill="#334155">출하_정리.py(시제 데이터·_scratch 삭제) → 등재(자산-등재.md) → CLAUDE.md 헌법 확인 → 출하 보고서(_개발자료/_qc/출하_보고서.md: V1/V2 점수·4단·KPI)</text>
+<text x="930" y="1157" font-size="11.2" fill="#334155">→ /mbo-천상 report(공개 /mbo report) → 학생 배포 시 _개발자료 분리 zip</text>
+<line x1="1225.0" y1="1190" x2="1225.0" y2="1200" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
+<rect x="920" y="1200" width="610" height="70" rx="6" fill="#ffffff" stroke="#1f2a44" stroke-width="1.4"/>
+<text x="930" y="1218" font-size="13" font-weight="700" fill="#1f2a44">Phase 9 운영·개선 루프</text>
+<text x="930" y="1236" font-size="11.2" fill="#334155">logs·history 트리거(상한 도달 누적 · 차단 반복 · 30일 사용 0) → 수리계약서(항목·수리·대조·이진 확인) → 회귀 깊이 표로 Phase 6/4/2/0 복귀</text>
+<path d="M 1530 1235 L 1590 1235 L 1590 160 L 1560 160" fill="none" stroke="#1f2a44" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#ah)"/>
 <text x="1600" y="300" font-size="11" font-weight="400" fill="#5b6472" text-anchor="start">회귀 (수리계약서)</text>
 <text x="916" y="1440" font-size="11.5" font-weight="400" fill="#5b6472" text-anchor="start">규칙: 검증자(V1·V2)는 Phase 7 에서만 · 검증 전 스냅샷 · 시운전 1회 · 제품 내부 지표를 PO 에게 중계하지 않음 · 설계도는 구현과 같아야 출하</text>
 <text x="916" y="1460" font-size="11.5" font-weight="400" fill="#5b6472" text-anchor="start">산출물 파일명은 SKILL.md §3 표와 checklists/phase_gates.md 가 단일 출처. 이 도식과 SKILL.md 절 번호가 어긋나면 도식이 틀린 것 — 같이 고친다.</text>

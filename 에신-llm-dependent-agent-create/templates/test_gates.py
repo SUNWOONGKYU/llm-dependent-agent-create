@@ -13,6 +13,8 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]          # 에이전트 폴더
 APP = ROOT / "app"
 TRACK = "gui"          # ▼ 도메인: "gui" | "cli" | "web" — plan.md §1 트랙과 같게. cli 트랙은 GUI 시험을 건너뛴다
+SCALE = "S"            # ▼ 도메인: "S" | "M" | "L" — plan.md §1 규모. 시험 하한 S 20 / M 60 / L 150 을 test_scale_minimum 이 강제한다
+MIN_TESTS = {"S": 20, "M": 60, "L": 150}
 gui = pytest.mark.skipif(TRACK != "gui", reason="GUI 트랙 아님")
 sys.path.insert(0, str(APP))
 os.environ["PYTHONUTF8"] = "1"
@@ -29,11 +31,14 @@ def test_start_bat_ascii_crlf_nobom():
 
 
 @gui
-def test_start_bat_no_paren_in_echo():
-    # cmd 블록 안 echo 문구의 괄호는 블록을 조기 종료시킨다(2026-09-17 실사고)
+def test_start_bat_no_paren_blocks():
+    # cmd 괄호 블록 안의 echo 는 문구의 괄호로 블록이 조기 종료된다(2026-09-17 실사고). 뼈대는 goto 로 짠다 — 괄호 블록 자체를 금지
     for ln in (ROOT / "시작.bat").read_text(encoding="ascii").splitlines():
-        if ln.strip().lower().startswith("echo") and ("(" in ln or ")" in ln):
-            pytest.fail("echo 문구에 괄호: " + ln)
+        low = ln.strip().lower()
+        if "echo" in low and ("(" in ln or ")" in ln):
+            pytest.fail("echo 가 있는 줄에 괄호: " + ln)
+        if low.startswith("if ") and low.rstrip().endswith("("):
+            pytest.fail("괄호 블록 사용 — goto 로 바꿀 것: " + ln)
 
 
 def test_compile_all():
@@ -150,6 +155,16 @@ def test_reset_path_requires_force_and_backup(tmp_path, monkeypatch):
     assert list((tmp_path / "state_backups").glob("state_before_*.json"))
 
 
+def test_phase_change_creates_snapshot(tmp_path, monkeypatch):
+    import store
+    monkeypatch.setattr(store, "STATE_PATH", tmp_path / "state.json")
+    monkeypatch.setattr(store, "BACKUP_DIR", tmp_path / "state_backups")
+    monkeypatch.setattr(store, "_PHASE_MARK", {"v": None})
+    store.update_state(lambda s: s.__setitem__("phase", "a"))
+    store.update_state(lambda s: s.__setitem__("phase", "b"))
+    assert list((tmp_path / "state_backups").glob("state_phase_a_*.json")), "단계가 바뀌었는데 스냅샷이 없다"
+
+
 # ───────────────────────────── 3b. 「정의됨 ≠ 호출됨」 — 설계 문서가 «구현했다»고 적은 함수가 실제로 있고, 다른 곳에서 불리는가
 def _doc_funcs():
     """bom.md·기획안_구현_대조표.md 에 `module.func` 꼴로 적힌 것 전부."""
@@ -183,6 +198,15 @@ def test_second_verifier_is_wired():
     head = src[:m.start()]
     fn = re.findall(r"^\s*def\s+([A-Za-z_]\w*)\s*\(", head, re.M)[-1]
     assert len(re.findall(r"(?<![\w.])%s\s*\(" % fn, src)) >= 2, "%s 는 정의만 있고 호출되지 않음" % fn
+
+
+# ───────────────────────────── 3c. 규모 하한
+def test_scale_minimum():
+    """plan.md 규모(S/M/L)에 맞는 시험 수 — _개발자료/tests/*.py 의 test_ 함수 수(parametrize 는 1로 센다)."""
+    n = 0
+    for p in Path(__file__).parent.glob("test_*.py"):
+        n += len(re.findall(r"^def test_\w+\(", p.read_text(encoding="utf-8"), re.M))
+    assert n >= MIN_TESTS[SCALE], "시험 %d건 < 규모 %s 하한 %d" % (n, SCALE, MIN_TESTS[SCALE])
 
 
 # ───────────────────────────── 4. 돌연변이 자가 검사 (이 파일이 진짜 재는지)

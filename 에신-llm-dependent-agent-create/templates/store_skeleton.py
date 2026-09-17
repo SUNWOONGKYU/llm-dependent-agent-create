@@ -22,6 +22,36 @@ _HISTORY_LOCK = threading.RLock()
 _LOG_LOCK = threading.Lock()
 
 
+class _FileLock:
+    """프로세스 간 상호배제 — UI 서버와 run.py 가 동시에 state 를 쓰는 것을 막는다(threading 락은 한 프로세스 안에서만 유효)."""
+    def __init__(self, path: Path, timeout: float = 8.0):
+        self.lock = path.with_suffix(path.suffix + ".lock"); self.timeout = timeout; self.fd = None
+
+    def __enter__(self):
+        t0 = time.monotonic()
+        while True:
+            try:
+                self.fd = os.open(str(self.lock), os.O_CREAT | os.O_EXCL | os.O_WRONLY); os.write(self.fd, str(os.getpid()).encode()); return self
+            except FileExistsError:
+                try:
+                    if time.time() - self.lock.stat().st_mtime > 60:      # 죽은 프로세스가 남긴 잠금
+                        self.lock.unlink()
+                        continue
+                except OSError:
+                    pass
+                if time.monotonic() - t0 > self.timeout:
+                    raise TimeoutError("state 잠금 대기 초과 — 다른 프로세스(UI/run.py)가 쓰는 중")
+                time.sleep(0.05)
+
+    def __exit__(self, *a):
+        try:
+            if self.fd is not None:
+                os.close(self.fd)
+            self.lock.unlink()
+        except OSError:
+            pass
+
+
 def _atomic_write_json(path: Path, data) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name("%s.%d.%d.tmp" % (path.name, os.getpid(), threading.get_ident()))
@@ -97,10 +127,13 @@ def backup_state(tag: str = "manual") -> Path:
 
 
 def save_state(st: dict) -> None:
-    with _STATE_LOCK:
-        # 단계가 바뀔 때마다 직전 상태를 스냅샷 — 덮어쓰기 사고(2026-09-17) 복구용
-        if STATE_PATH.exists() and _PHASE_MARK["v"] is not None and st.get("phase") != _PHASE_MARK["v"]:
-            backup_state("phase_%s" % _PHASE_MARK["v"])
+    with _STATE_LOCK, _FileLock(STATE_PATH):
+        # 단계가 바뀔 때마다 직전 상태를 스냅샷 — 덮어쓰기 사고(2026-09-17) 복구용. 재시작 직후에는 파일의 phase 를 기준으로 삼는다.
+        if STATE_PATH.exists():
+            if _PHASE_MARK["v"] is None:
+                _PHASE_MARK["v"] = (_read_json(STATE_PATH, {}) or {}).get("phase")
+            if _PHASE_MARK["v"] is not None and st.get("phase") != _PHASE_MARK["v"]:
+                backup_state("phase_%s" % _PHASE_MARK["v"])
         _PHASE_MARK["v"] = st.get("phase")
         st["updated"] = now_iso()
         _atomic_write_json(STATE_PATH, st)

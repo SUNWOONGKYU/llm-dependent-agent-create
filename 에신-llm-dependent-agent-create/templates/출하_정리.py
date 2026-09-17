@@ -47,6 +47,11 @@ def clear():
     # 발굴 원본 클론은 출하물에 절대 남기지 않는다(타인 API 키가 들어 있던 실사고 2026-09-17)
     if (ROOT / "_scratch").exists():
         shutil.rmtree(ROOT / "_scratch", ignore_errors=True)
+        if (ROOT / "_scratch").exists():
+            print("[경고] _scratch 를 지우지 못했습니다(열린 파일?) — 출하물에 남으면 안 됩니다. 수동 삭제 후 다시 세십시오.")
+    left = count()
+    if left:
+        print("[경고] 지운 뒤에도 %d 개가 남았습니다 — 잠긴 파일을 확인하십시오." % left)
 
 
 def pack():

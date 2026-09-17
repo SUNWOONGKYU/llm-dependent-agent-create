@@ -63,7 +63,7 @@ def intake(*required, names: list[str] | None = None, profile: dict | None = Non
             st["current"] = item_id
             st["pseudonym_names"] = sorted(set((st.get("pseudonym_names") or []) + list(names or [])))
             st["profile"] = dict(st.get("profile") or {}, **(profile or {}))
-            st["phase"] = "{{첫 단계 이름}}"
+            st["phase"] = "intake"
         st = store.update_state(_add)
         _NAMES.clear(); _NAMES.extend(st["pseudonym_names"])
         store.log("시스템", "{{작업 단위}} 추가 — %s" % item_id)
@@ -79,7 +79,8 @@ def intake(*required, names: list[str] | None = None, profile: dict | None = Non
         st["intake"] = {k: v for k, v in fields.items() if k != "names"}
         st["profile"] = dict(store.load_config("profile.json", {}), **(profile or {}))
         st["pseudonym_names"] = list(names or [])
-        st["phase"] = "{{첫 단계 이름}}"
+        st["phase"] = "intake"
+        st["items"] = {"1": {"status": "pending", "calls": 0, **{k: v for k, v in fields.items() if k != "names"}}}
     st = store.update_state(_set)
     _NAMES.clear(); _NAMES.extend(names or [])
     store.log("시스템", "{{작업 단위}} 시작 — %s" % json.dumps(fields, ensure_ascii=False)[:60])
@@ -87,17 +88,94 @@ def intake(*required, names: list[str] | None = None, profile: dict | None = Non
 
 
 # ---------------------------------------------------------------- 자율 루프 (▼ 도메인)
+# ---------------------------------------------------------------- 범용 3단계 (복사 직후에도 돈다 — 도메인은 STEPS 를 바꾸거나 함수를 교체한다)
+def _rubric() -> str:
+    p = APP / "skills" / "rubric.md"
+    return p.read_text(encoding="utf-8") if p.exists() else "{{판정 기준 — skills/rubric.md 에 적는다}}"
+
+
+def _cur_item(st: dict):
+    """SINGLE 이면 items 의 유일 항목(없으면 '1'), MULTI 면 state['current']."""
+    if WORK_MODE == "MULTI":
+        return st.get("current")
+    return next(iter(st.get("items") or {}), None) or "1"
+
+
+def _bump(item_id: str, **fields) -> dict:
+    def _set(st):
+        it = st.setdefault("items", {}).setdefault(item_id, {"status": "pending", "calls": 0})
+        it["calls"] = it.get("calls", 0) + fields.pop("_call", 0)
+        it.update(fields)
+    return store.update_state(_set)
+
+
+def step_draft(st: dict, item_id: str) -> str:
+    """① 작업 — 입력을 산출물 초고로. ▼ 도메인: 프롬프트를 skills/persona.md·구조 규칙으로 바꾼다."""
+    src = json.dumps(st.get("intake") or (st["items"].get(item_id) or {}), ensure_ascii=False)
+    r = _call_llm("\n".join(["{{페르소나 한 줄 — skills/persona.md}}", "# 입력\n" + src, "# 과제\n{{입력을 어떤 산출물로 바꾸나}} — 모르는 값은 지어내지 말고 [확인 필요]."]), "draft")
+    _bump(item_id, _call=1)
+    if not r["ok"]:
+        raise Blocked("초고 생성 실패: " + llm.human_reason(r["error"] or ""))
+    text, removed = guard.filter_output(r["text"])            # 고정 문구형 가드 실집행
+    if removed:
+        store.log("시스템", "출력 필터 치환 %d건" % len(removed))
+    for issue in guard.persona_check(text)[:5]:
+        store.log("시스템", "페르소나 이탈: %s" % issue)
+    return text
+
+
+def step_verify(st: dict, item_id: str, text: str) -> dict:
+    """② 1차(Claude 별도 호출) → 2차(Codex). 결과는 item 에 저장되고 화면이 읽는다."""
+    v1 = verify_1st(text, _rubric()); _bump(item_id, _call=1, verify1=(v1.get("data") or {"pass": None, "issues": [v1.get("error")]}))
+    v2 = verify_2nd(text, _rubric()); _bump(item_id, _call=1, verify2=dict(v2.get("data") or {"pass": None, "issues": [v2.get("error")]}, provider=v2.get("provider")))
+    return {"v1": v1, "v2": v2}
+
+
+def step_finish(st: dict, item_id: str, text: str) -> Path:
+    """③ 마감 — 고지 붙여 OUT 에 저장(덮어쓰기 금지). 사람 승인이 필요한 도메인은 여기 앞에 승인 게이트를 둔다."""
+    note = guard.ai_disclosure(st.get("profile") or {}, st.get("settings") or {})
+    body = text + (("\n\n---\n" + note) if note else "")
+    p = OUT / ("%s_%s.md" % (item_id, store.now_iso()[:10])); i = 2
+    while p.exists():
+        p = OUT / ("%s_%s(%d).md" % (item_id, store.now_iso()[:10], i)); i += 1
+    p.write_text(body, encoding="utf-8")
+    return p
+
+
+STEPS = [("draft", step_draft), ("verify", step_verify), ("finish", step_finish)]   # ▼ 도메인: 단계 이름 = 화면 진행 단계 = 흐름도 번호
+
+
 def run_all(progress=None) -> dict:
-    """단계 순서대로 끝까지. 각 단계 체크포인트. 상한 도달 단계는 건너뛰고 계속(보고에 남김). 이어쓰기: 중단된 단계는 기존 산출물에서 재개."""
+    """단계 순서대로 끝까지. 상한(호출·분) 실집행. 이어쓰기: item 에 draft 가 있으면 초고를 다시 만들지 않는다."""
     st = store.load_state()
     if st.get("blocked"):
         raise Blocked("차단 상태: %s" % st["blocked"]["code"])
-    # ▼ 도메인: 단계 함수들을 순서대로. 최소 골격 —
-    #   draft = _call_llm(prompt, "draft")            # 작업(Claude)
-    #   v1 = verify_1st(draft["text"], rubric)        # 1차 검증(Claude 별도 호출) → 미달이면 수정 ≤ N회
-    #   v2 = verify_2nd(draft["text"], rubric)        # 2차 검증(Codex) → 결과를 item["verify2"] 에 저장, 화면에 표시
-    #   [사람 승인] → 최종 산출물 → OUT
-    raise NotImplementedError("▼ 도메인: 단계 함수들을 여기서 순서대로 부른다 — verify_1st·verify_2nd 를 반드시 호출한다")
+    item_id = _cur_item(st)
+    if not item_id or item_id not in (st.get("items") or {}):
+        raise Blocked("시작할 {{작업 단위}}이 없습니다 — 먼저 입력(intake)하세요.")
+    max_calls, max_min = _limits(st)
+    t0 = time.monotonic()
+    item = st["items"][item_id]
+    text = item.get("draft") or ""
+    for name, fn in STEPS:
+        st = store.load_state(); item = st["items"][item_id]
+        if item.get("calls", 0) >= max_calls or (time.monotonic() - t0) / 60 >= max_min:
+            _bump(item_id, status="stalled", note="상한 도달(호출 %d/%d) — 사람이 확인" % (item.get("calls", 0), max_calls))
+            store.log("시스템", "%s 상한 도달 — 멈춤" % item_id)
+            return store.load_state()["items"][item_id]
+        store.update_state(lambda s: s.__setitem__("phase", name))
+        if name == "draft":
+            if not text:
+                text = step_draft(st, item_id); _bump(item_id, status="drafting", draft=text)
+        elif name == "verify":
+            step_verify(st, item_id, text); _bump(item_id, status="verifying")
+        elif name == "finish":
+            p = step_finish(st, item_id, text); _bump(item_id, status="done", output=str(p))
+        if progress:
+            progress(name)
+    store.update_state(lambda s: s.__setitem__("phase", "done"))
+    store.log("AI", "%s 완료" % item_id)
+    return store.load_state()["items"][item_id]
 
 
 def resume() -> dict:

@@ -5,12 +5,18 @@
 ▼ 도메인: APP_SLUG·PORT·EXPECT_RIGHT(도메인 어휘로 바꾼 우측 블록 제목 7개)만 채운다.
 """
 import asyncio, json, os, sys
-from playwright.async_api import async_playwright
+try:
+    from playwright.async_api import async_playwright
+except ImportError:
+    print("Playwright 가 없습니다: python -m pip install playwright && python -m playwright install chromium"); sys.exit(2)
 APP_SLUG = "{{agent-slug}}"; PORT = {{포트}}
 EXPECT_LEFT = ["페르소나", "LLM", "도구", "지식베이스"]                                   # 고정
 EXPECT_RIGHT = ["{{설정}}", "{{목록}}", "목표", "진행 단계 (자율 루프)", "안전 체계", "{{오늘의 기록}}", "{{대기 항목}}"]  # 어휘만 도메인
 OUT = os.path.join(os.path.dirname(__file__), "")
-TOKEN = open(os.path.join(os.environ["LOCALAPPDATA"], APP_SLUG, "token")).read().strip()
+_tp = os.path.join(os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"), APP_SLUG, "token")
+if not os.path.exists(_tp):
+    print("토큰 파일이 없습니다 — 시작.bat 으로 서버를 먼저 띄우십시오: " + _tp); sys.exit(2)
+TOKEN = open(_tp).read().strip()
 URL = "http://127.0.0.1:%d/?t=%s" % (PORT, TOKEN)
 
 async def main():
@@ -20,7 +26,11 @@ async def main():
         for scheme in ("light", "dark"):
             pg = await b.new_page(viewport={"width": 1440, "height": 900}, color_scheme=scheme); errs = []
             pg.on("console", lambda m: errs.append(m.text) if m.type == "error" else None)
-            await pg.goto(URL); await pg.wait_for_timeout(1500)
+            try:
+                await pg.goto(URL)
+            except Exception as ex:
+                print("서버에 연결할 수 없습니다(시작.bat 으로 띄웠는지 확인): %s" % str(ex).splitlines()[0]); sys.exit(2)
+            await pg.wait_for_timeout(1500)
             if scheme == "light":
                 out["cols"] = await pg.evaluate("[...document.querySelectorAll('.grid > *')].map(e=>Math.round(e.getBoundingClientRect().width))")
                 out["left"] = await pg.evaluate("[...document.querySelectorAll('aside.col-left > details > summary .cat-fold-title, aside.col-left > .cat-block h2')].map(e=>e.textContent.trim())")

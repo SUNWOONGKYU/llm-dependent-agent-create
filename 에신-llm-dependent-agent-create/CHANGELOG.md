@@ -2,6 +2,12 @@
 
 > V4.0 부터는 이 파일에만 적는다. SKILL.md 에는 버전과 한 줄 요약만.
 
+V4.3 (2026-09-17) — 타 세션(guide-68) 독립 검증 목록 반영: 에신 VS1 7 · A판 2 · 라이트 5 · templates 차단 6+주의
+  · V2 모델 gpt-5.6-terra 로 전 파일 통일(sol 흔적 제거) · 「LLM = CLI 두 종, 자리 세 개」 용어 정리 · 구 「Phase 6b 플랫폼 레이어」→ 6-P(시운전 6b 와 충돌 해소) · docs/30 의 Claude→Gemini 잔재 → Codex
+  · SVG: docs/15 추가, Phase 3/4 분리, 6b 시운전 별도 상자
+  · templates: engine_skeleton `run_all` 이 복사 직후에도 도는 범용 3단계(초고→1차·2차 검증→마감, 상한·가드·고지 실집행) · gui_skeleton `#btn-new-case` 핸들러 · store 프로세스 간 잠금 파일 + 재시작 후 첫 단계 스냅샷 · 시작.bat 괄호 블록 제거(goto) · test_gates 규모 하한 강제 + bat 괄호 검사 강화 · smoke_ui 전제 실패 안내 · 출하_정리 삭제 실패 보고
+  · A판: 본체 「필수 요건 9/6」 참조 → docs/31 · '도구 6종' 정정 · 라이트: 규모 최소 M·참조 경로·산출물 폴더 차이 명시
+
 V4.2 (2026-09-17) — 시범품(회의록) V1 정식 검증 79점·High 1건(Codex 2차 검증이 정의만 있고 호출부 0, 매뉴얼은 실제 기능처럼 기술) 반영
   · templates/test_gates.py: `test_documented_function_exists_and_is_called`(bom·대조표의 module.func 가 존재+호출부 ≥1) · `test_second_verifier_is_wired`(engine 에 providers=["codex"…] 호출 + 그 함수가 불림)
   · engine_skeleton: `verify_1st`(Claude 별도 호출)·`verify_2nd`(Codex) 훅 + run_all 골격에서 호출 의무
