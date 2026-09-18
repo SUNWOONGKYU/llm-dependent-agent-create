@@ -27,7 +27,7 @@ UPLOAD_DIR = BASE / "uploads"; UPLOAD_DIR.mkdir(exist_ok=True)
 RUNTIME_DIR = BASE / ".runtime"; RUNTIME_DIR.mkdir(exist_ok=True)
 LOCK_FILE = RUNTIME_DIR / "ui.lock"
 APP_NAME = "{{에이전트 이름}}"          # ▼ 도메인
-APP_SLUG = "{{agent-slug}}"            # ▼ 도메인 — 토큰 폴더 이름(ASCII)
+APP_SLUG = "{{agent-slug}}"            # ▼ 도메인 — 토큰 폴더 이름(ASCII 필수 — 한글이면 아래 server_version 이 Server 헤더로 나갈 때 UnicodeEncodeError)
 VERSION = "0.1"
 PORT = 7700                            # ▼ 도메인 — 에이전트마다 다른 포트
 COOKIE = APP_SLUG.replace("-", "_") + "_auth"
@@ -218,7 +218,7 @@ def _has(mod: str) -> bool:
 
 # ---------------------------------------------------------------- 핸들러
 class Handler(http.server.BaseHTTPRequestHandler):
-    server_version = APP_SLUG + "/" + VERSION
+    server_version = APP_SLUG + "/" + VERSION   # APP_SLUG 에 한글이 섞이면 이 값이 Server 헤더로 나갈 때 UnicodeEncodeError — APP_SLUG 는 반드시 ASCII
 
     def log_message(self, *a):          # 조용히
         pass
@@ -294,7 +294,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             except Exception as e:
                 return self._json(500, {"ok": False, "error": str(e)})
             return self._json(200, {"ok": True})
-        if u.path == "/api/manual":
+        if u.path in ("/api/manual", "/manual"):                # index.html 의 「사용자 매뉴얼」 링크는 /manual (V1 실측 404 2026-09-17)
             p = BASE.parent / "사용자 매뉴얼(설치 및 사용법).html"
             return self._send(200, p.read_bytes(), "text/html; charset=utf-8") if p.exists() else self._json(404, {"error": "매뉴얼 없음"})
         if u.path == "/api/setup":                                   # 설치 도우미 상태(LLM 두 자리 설치·로그인)

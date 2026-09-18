@@ -24,12 +24,12 @@
 {{폴더}}/
 ├─ 시작.bat                      사용자가 누르는 유일한 파일 (ASCII)
 ├─ CLAUDE.md · README.md · 사용자 매뉴얼(설치 및 사용법).html · 이번에 바뀐 것.md · 확인이 필요한 사항 목록.md
-├─ app/                          본체 (사용자는 열 일 없음)
-│  ├─ engine.py  State Machine(무판단 스케줄러) + 액션봇(LLM) 합작 · store.py  상태·잠금·스냅샷 · llm.py  CLI 두 자리
-│  ├─ guard.py  가명화·출력 필터 · uicontract.py  백엔드 키 ↔ 화면 렌더러 계약 · ui.py · ui/index.html
-│  ├─ skills/*.md  규칙 SSOT · config/ · vault/ · uploads/ · output/ · logs/ · state.json · state_backups/
+├─ app/                          에이전트 본체(실행부+화면부+공통부) (사용자는 열 일 없음)
+│  ├─ engine.py  State Machine(무판단 스케줄러) + 액션봇(LLM) 합작 · store.py  상태·잠금·스냅샷 · llm.py  CLI 두 자리   ← 실행부
+│  ├─ guard.py  가명화·출력 필터 · uicontract.py  백엔드 키 ↔ 화면 렌더러 계약 · ui.py · ui/index.html   ← 화면부
+│  ├─ skills/*.md  규칙 SSOT · config/ · vault/ · uploads/ · output/ · logs/ · state.json · state_backups/   ← 공통부 최소 구성
 └─ _개발자료/                    실무자 눈에 안 띄게 분리
-   ├─ _design/  plan.md · {{이름}}_architecture.svg · bom.md · 기획안_구현_대조표.md · phase5_selfcheck.md
+   ├─ _design/  plan.md · {{이름}}_architecture.svg · bom.md · 기획안_구현_대조표.md · phase5_design_verify.md
    ├─ _qc/  출하_보고서.md · V1/V2 보고서 · 대조표 · 캡처 · pre_verify_snapshot/
    ├─ tests/  test_gates.py … · tools/  출하_정리.py · verify_windows_adapter.ps1 · manual/
 ```

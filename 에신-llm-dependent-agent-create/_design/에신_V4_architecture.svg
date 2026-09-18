@@ -12,14 +12,14 @@
 <text x="70" y="186" font-size="11.2" fill="#334155">Codex CLI (gpt-5.6-terra 고정) — V2 교차 검증. 없으면 Opus 5 Teammate 폴백</text>
 <text x="70" y="201" font-size="11.2" fill="#334155">그 외 스킬(diagram·5times…)은 선택 보조 — 없으면 본문 폴백</text>
 <rect x="460" y="120" width="380" height="118" rx="6" fill="#eef3ff" stroke="#1f2a44" stroke-width="1.4"/>
-<text x="470" y="138" font-size="13" font-weight="700" fill="#1f2a44">검증 편제 (Phase 7 에서만 소환)</text>
+<text x="470" y="138" font-size="13" font-weight="700" fill="#1f2a44">검증 편제 (Phase 5·Phase 7 에서만 소환, 각 1회)</text>
 <text x="470" y="156" font-size="11.2" fill="#334155">작성자 = 이 스킬을 실행하는 세션 (Opus 5) — 자기 검증 금지</text>
-<text x="470" y="171" font-size="11.2" fill="#334155">V1 = Claude Code Teammate Sonnet 5 · 읽기전용 · 상태 변경 함수 호출 금지</text>
-<text x="470" y="186" font-size="11.2" fill="#334155">V2 = Codex CLI (L 규모만) · 읽기전용 샌드박스 · 폴백 Opus 5 Teammate</text>
+<text x="470" y="171" font-size="11.2" fill="#334155">V1 = Claude Code Teammate Sonnet 5(Phase5 문서만/Phase7 전체, 다른 세션) · 상태 변경 함수 호출 금지</text>
+<text x="470" y="186" font-size="11.2" fill="#334155">V2 = Codex CLI (Phase7, L 규모만) · 읽기전용 샌드박스 · 폴백 Opus 5 Teammate</text>
 <text x="470" y="201" font-size="11.2" fill="#334155">소환 전 스냅샷 · 제조 맥락 비전달 · 반려는 항목만 이진 재확인</text>
 <rect x="60" y="270" width="780" height="120" rx="6" fill="#fff3e0" stroke="#1f2a44" stroke-width="1.4"/>
 <text x="70" y="288" font-size="13" font-weight="700" fill="#1f2a44">SKILL.md V4.0 (≤800행) — 지휘 문서. 설명은 하지 않고 «순서·분기·산출물·게이트»만 적는다</text>
-<text x="70" y="306" font-size="11.2" fill="#334155">§1 원칙 9(역할 고정·자기검증 금지·시운전 1회·설계도 갱신·어휘 교체 …)   §2 편제   §3 Phase 0~9 표(입력/할 일/산출물 파일/게이트)</text>
+<text x="70" y="306" font-size="11.2" fill="#334155">§1 원칙 9(역할 고정·자기검증 금지·시운전 1회·아키텍처 파일 갱신·어휘 교체 …)   §2 편제   §3 Phase 0~9 표(입력/할 일/산출물 파일/게이트)</text>
 <text x="70" y="321" font-size="11.2" fill="#334155">§4 분기 트리 3개(원자재 A/B · 트랙 GUI/비GUI/웹 · 규모 S/M/L → V2 여부)   §5 합격 판정 7-5   §6 금지 사항   §7 도구</text>
 <text x="70" y="336" font-size="11.2" fill="#334155">각 Phase 행은 docs/·templates/·checklists/ 의 파일 하나를 가리킨다 — 본문에 절차를 다시 쓰지 않는다</text>
 <rect x="60" y="430" width="250" height="250" rx="6" fill="#f1f8e9" stroke="#1f2a44" stroke-width="1.4"/>
@@ -47,18 +47,20 @@
 <text x="350" y="541" font-size="11.2" fill="#334155">setup_helper.py (CLI 로그인 도우미)</text>
 <text x="350" y="556" font-size="11.2" fill="#334155">출하_정리.py (시제 데이터 삭제·포장)</text>
 <text x="350" y="571" font-size="11.2" fill="#334155">test_gates.py (가드·진입점·계약 시험)</text>
-<text x="350" y="586" font-size="11.2" fill="#334155">V1_지시서.md · V2_지시서.md</text>
-<text x="350" y="601" font-size="11.2" fill="#334155">plan.md · bom.md · 대조표.md 양식</text>
+<text x="350" y="586" font-size="11.2" fill="#334155">V1_지시서.md · V2_지시서.md (Phase7)</text>
+<text x="350" y="601" font-size="11.2" fill="#334155">V1_지시서_설계검증.md (Phase5, 신규)</text>
+<text x="350" y="616" font-size="11.2" fill="#334155">plan.md · bom.md · 대조표.md 양식</text>
 <rect x="620" y="430" width="220" height="250" rx="6" fill="#f1f8e9" stroke="#1f2a44" stroke-width="1.4"/>
 <text x="630" y="448" font-size="13" font-weight="700" fill="#1f2a44">checklists/ (게이트)</text>
 <text x="630" y="466" font-size="11.2" fill="#334155">phase_gates.md</text>
 <text x="630" y="481" font-size="11.2" fill="#334155">  Phase 마다 «이 파일이 있어야</text>
 <text x="630" y="496" font-size="11.2" fill="#334155">  다음 Phase» 표</text>
 <text x="630" y="511" font-size="11.2" fill="#334155">v1_v2_대조표.md</text>
-<text x="630" y="526" font-size="11.2" fill="#334155">  4단 QC · 6축 · 화면 고정표 ·</text>
+<text x="630" y="526" font-size="11.2" fill="#334155">  4단 QC · 5축 · 화면 고정표 ·</text>
 <text x="630" y="541" font-size="11.2" fill="#334155">  SVG↔화면 1:1 · 시작.bat 실기동</text>
 <text x="630" y="556" font-size="11.2" fill="#334155">gui_고정표.md</text>
 <text x="630" y="571" font-size="11.2" fill="#334155">  좌0~4 · 중0~N · 우0~7 · 하단 · FAB</text>
+<text x="630" y="586" font-size="11.2" fill="#334155">phase5_설계검증.md (신규) — 이진 12항목</text>
 <rect x="60" y="720" width="780" height="200" rx="6" fill="#fffde7" stroke="#1f2a44" stroke-width="1.4"/>
 <text x="70" y="738" font-size="13" font-weight="700" fill="#1f2a44">산출물 = 에이전트 폴더 (공증 구조 그대로)</text>
 <text x="70" y="756" font-size="11.2" fill="#334155">app/  engine(State Machine) · store · llm(claude→codex 두 자리) · guard · uicontract · ui.py · ui/index.html · skills/*.md(SSOT) · config/</text>
@@ -67,7 +69,7 @@
 <text x="70" y="801" font-size="11.2" fill="#334155">7대 구성요소 = 파일: 🎭 skills/persona.md 🎯 목표(state) 🤖 llm.py 📘 skills·vault·API 🔧 도구 모듈 🛡️ guard·게이트 🔁 engine 루프</text>
 <rect x="60" y="960" width="780" height="130" rx="6" fill="#fce4ec" stroke="#1f2a44" stroke-width="1.4"/>
 <text x="70" y="978" font-size="13" font-weight="700" fill="#1f2a44">품질을 만든 장치 (공증 실물에서 추출 — 스킬이 강제하는 것)</text>
-<text x="70" y="996" font-size="11.2" fill="#334155">① 뼈대 복제 ② 화면 고정표 대조 ③ uicontract(백엔드 키↔화면) ④ 시험 하한(S 20·M 60·L 150 + 돌연변이) ⑤ 설계도 갱신 규정</text>
+<text x="70" y="996" font-size="11.2" fill="#334155">① 뼈대 복제 ② 화면 고정표 대조 ③ uicontract(백엔드 키↔화면) ④ 시험 하한(S 20·M 60·L 150 + 돌연변이) ⑤ 아키텍처 파일 갱신 규정</text>
 <text x="70" y="1011" font-size="11.2" fill="#334155">⑥ 설치 도우미·시작.bat 실기동 ⑦ 헌법에 함정·명령 블록 ⑧ 미확인 ≠ 통과(칩 3값) ⑨ 수리계약서 루프 ⑩ 출하 정리 ⑪ 도메인 어휘 교체</text>
 <line x1="240" y1="238" x2="240" y2="270" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
 <text x="244.0" y="250.0" font-size="11" fill="#5b6472">Phase 2·8 호출</text>
@@ -87,7 +89,7 @@
 <text x="40" y="1120" font-size="11.5" font-weight="400" fill="#5b6472" text-anchor="start">읽기: 파일 하나 = Phase 하나. 학생은 SKILL.md 표에서 자기 Phase 행을 찾고, 거기 적힌 docs 1개·templates N개·checklist 1개만 연다.</text>
 <text x="40" y="1140" font-size="11.5" font-weight="400" fill="#5b6472" text-anchor="start">자기완결: 공증 에이전트 원본을 열 필요 없다 — 구성은 docs/01·31·gui_skeleton 에 전부 옮겨져 있다. 외부 원본 비교 항목 없음.</text>
 <rect x="900" y="70" width="980" height="1400" rx="10" fill="#ffffff" stroke="#c9d1dc"/>
-<text x="916" y="96" font-size="15" font-weight="700" fill="#1f2a44" text-anchor="start">흐름도 — Phase 0 → 9 와 분기 ◇ (⛔ = PO 게이트, 🔍 = 검증자 소환은 여기뿐)</text>
+<text x="916" y="96" font-size="15" font-weight="700" fill="#1f2a44" text-anchor="start">흐름도 — Phase 0 → 9 와 분기 ◇ (⛔ = PO 게이트, 🔍 = 검증자 소환 — Phase 5·7 뿐)</text>
 <rect x="920" y="115" width="610" height="92" rx="6" fill="#ffffff" stroke="#1f2a44" stroke-width="1.4"/>
 <text x="930" y="133" font-size="13" font-weight="700" fill="#1f2a44">Phase 0 시동</text>
 <text x="930" y="151" font-size="11.2" fill="#334155">0-0 mbo-천상 확인 → 없으면 자동 설치·검증 (실패 = Phase 2 금지)</text>
@@ -133,8 +135,8 @@
 <text x="930" y="632" font-size="11.2" fill="#334155">산출물: bom.md · SOURCE_REUSE_LOG.md · THIRD_PARTY_NOTICES.md · 게이트: 🔴 분리 완료</text>
 <line x1="1225.0" y1="655" x2="1225.0" y2="665" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
 <rect x="920" y="665" width="610" height="60" rx="6" fill="#ffffff" stroke="#1f2a44" stroke-width="1.4"/>
-<text x="930" y="683" font-size="13" font-weight="700" fill="#1f2a44">Phase 5 자체 점검 1회 (검증자 없음)</text>
-<text x="930" y="701" font-size="11.2" fill="#334155">5A 루브릭 셀프 채점 → _개발자료/_design/phase5_selfcheck.md · 5B 진단·해체는 M·L 만 · 80 미만이면 PO 보고</text>
+<text x="930" y="683" font-size="13" font-weight="700" fill="#1f2a44">Phase 5 설계서 확정 + 설계 검증 🔍 (V1 1회, 문서만)</text>
+<text x="930" y="701" font-size="11.2" fill="#334155">plan·SVG·bom 만 읽고 이진 12항목 판정 → phase5_design_verify.md · 반려는 그 항목만 재확인, 전항 O → Phase 6</text>
 <line x1="1225.0" y1="725" x2="1225.0" y2="735" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
 <rect x="920" y="735" width="610" height="135" rx="6" fill="#f1f8e9" stroke="#1f2a44" stroke-width="1.4"/>
 <text x="930" y="753" font-size="13" font-weight="700" fill="#1f2a44">Phase 6 조립</text>
@@ -142,7 +144,7 @@
 <text x="930" y="786" font-size="11.2" fill="#334155">◇ 트랙 분기</text>
 <text x="930" y="801" font-size="11.2" fill="#334155">  GUI 트랙(docs/31): gui_skeleton 복사 → {{ }} 채움 → 도메인 어휘 교체 → 고정표 자기 대조 → ui.py 라우트 계약 → 시작.bat 실기동</text>
 <text x="930" y="816" font-size="11.2" fill="#334155">  비GUI 트랙(docs/32): run.py + 명령 4개 · 웹사이트형: 페이지 = UI(7요소·안전 요건만)</text>
-<text x="930" y="831" font-size="11.2" fill="#334155">설계도 갱신 규정: 구현이 설계와 달라지는 순간 SVG·plan 수정, 마감 때 화면 단계 ↔ 흐름도 1:1 대조</text>
+<text x="930" y="831" font-size="11.2" fill="#334155">아키텍처 파일 갱신 규정: 구현이 설계와 달라지는 순간 SVG·plan 수정, 마감 때 화면 단계 ↔ 흐름도 1:1 대조</text>
 <text x="930" y="846" font-size="11.2" fill="#334155">게이트(checklists/phase_gates): 산출물 파일 전부 존재 + 시험 하한 + 자체 대조표 O</text>
 <polygon points="1660,767.0 1735.0,795 1660,823.0 1585.0,795" fill="#fff7d6" stroke="#8a6d00" stroke-width="1.4"/>
 <text x="1660" y="791" font-size="11.5" text-anchor="middle" fill="#1f2a44">GUI 트랙?</text>
@@ -156,9 +158,9 @@
 <text x="930" y="931" font-size="11.2" fill="#334155">결함은 고치되 재실행은 여정이 끊겼을 때만 · 게이트: 여정 완주 증거</text>
 <line x1="1225.0" y1="954" x2="1225.0" y2="964" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
 <rect x="920" y="964" width="610" height="132" rx="6" fill="#fce4ec" stroke="#1f2a44" stroke-width="1.4"/>
-<text x="930" y="982" font-size="13" font-weight="700" fill="#1f2a44">Phase 7 출하 검사 🔍 — 검증자를 부르는 유일한 곳</text>
-<text x="930" y="1000" font-size="11.2" fill="#334155">0) 작성자 스냅샷 _개발자료/_qc/pre_verify_snapshot/ → V1 소환(templates/V1_지시서: 상태 변경 금지·읽기전용)</text>
-<text x="930" y="1015" font-size="11.2" fill="#334155">1) V1 1회: 4단 QC(정적·동적·클릭·가드 시뮬) + 6축 100점 + 화면 고정표 대조 + SVG↔화면 1:1 + 시작.bat 그대로 기동</text>
+<text x="930" y="982" font-size="13" font-weight="700" fill="#1f2a44">Phase 7 출하 검사 🔍 — 출하 검증(설계 적합성은 Phase 5 기 완료)</text>
+<text x="930" y="1000" font-size="11.2" fill="#334155">0) 작성자 스냅샷 _개발자료/_qc/pre_verify_snapshot/ → V1 소환(templates/V1_지시서: 상태 변경 금지·읽기전용, Phase5 V1 과 다른 세션)</text>
+<text x="930" y="1015" font-size="11.2" fill="#334155">1) V1 1회: 4단 QC(정적·동적·클릭·가드 시뮬) + 5축 100점 + 화면 고정표 대조 + SVG↔화면 1:1 + 시작.bat 그대로 기동</text>
 <text x="930" y="1030" font-size="11.2" fill="#334155">◇ 합격선: 총점 ≥95 AND Critical·High 0 AND 4단 전항 O AND 사용자 여정 KPI → 불합격이면 수정 → 그 항목만 이진 재확인</text>
 <text x="930" y="1045" font-size="11.2" fill="#334155">◇ 규모 L? → V2 1회(Codex terra 고정, 폴백 Opus Teammate) 같은 양식 → |V1−V2|>3 이면 V2 결함 수정·항목 재확인</text>
 <text x="930" y="1060" font-size="11.2" fill="#334155">S·M 은 V1 로 출하. V1 없이 출하 금지, L 은 V2 도 있어야 출하</text>
@@ -182,6 +184,6 @@
 <text x="930" y="1236" font-size="11.2" fill="#334155">logs·history 트리거(상한 도달 누적 · 차단 반복 · 30일 사용 0) → 수리계약서(항목·수리·대조·이진 확인) → 회귀 깊이 표로 Phase 6/4/2/0 복귀</text>
 <path d="M 1530 1235 L 1590 1235 L 1590 160 L 1560 160" fill="none" stroke="#1f2a44" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#ah)"/>
 <text x="1600" y="300" font-size="11" font-weight="400" fill="#5b6472" text-anchor="start">회귀 (수리계약서)</text>
-<text x="916" y="1440" font-size="11.5" font-weight="400" fill="#5b6472" text-anchor="start">규칙: 검증자(V1·V2)는 Phase 7 에서만 · 검증 전 스냅샷 · 시운전 1회 · 제품 내부 지표를 PO 에게 중계하지 않음 · 설계도는 구현과 같아야 출하</text>
+<text x="916" y="1440" font-size="11.5" font-weight="400" fill="#5b6472" text-anchor="start">규칙: 검증자(V1·V2)는 Phase 5·Phase 7 에서만(각 1회, 다른 세션) · 검증 전 스냅샷 · 시운전 1회 · 제품 내부 지표를 PO 에게 중계하지 않음 · 아키텍처 파일은 구현과 같아야 출하</text>
 <text x="916" y="1460" font-size="11.5" font-weight="400" fill="#5b6472" text-anchor="start">산출물 파일명은 SKILL.md §3 표와 checklists/phase_gates.md 가 단일 출처. 이 도식과 SKILL.md 절 번호가 어긋나면 도식이 틀린 것 — 같이 고친다.</text>
 </svg>

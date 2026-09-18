@@ -5,6 +5,8 @@
 실행: set PYTHONUTF8=1 && python -m pytest _개발자료/tests -q -p no:cacheprovider
 원칙: ① 상태를 쓰는 함수는 임시 state 로만 ② «글자가 근처에 있는가» 시험 금지(함수 본문·라우트 경계로 자른다)
       ③ 새 시험은 일부러 망가뜨려 빨간불이 나는지 본 뒤 넣는다(돌연변이 1회) ④ 미확인 ≠ 통과
+주의: test_output_filter_blocks_forbidden_claims 2건은 모든 {{ }} 를 같은 더미값으로 치환하면 실패가
+      정상이다(금지문구=치환문구). 코드 결함 아님 — 도메인 값(금지문구≠치환문구)을 채우면 통과. docs/40 §3
 """
 import io, json, os, re, subprocess, sys
 from pathlib import Path
@@ -130,6 +132,11 @@ def test_guard_scan_leak_catches_rrn():
     assert guard.scan_leak("주민번호 900101-1234567")
 
 
+#  ★ 더미 치환 주의 — {{도메인 금지 문구 N}} 과 guard.py 안의 실제 금지 문구를 **같은 더미값**(예:
+#  전부 "dummy")으로 치환하면 이 아래 2건(parametrize 2 케이스)이 실패하는 게 정상이다(금지문구=치환문구
+#  가 되어 guard.filter_output 로직과 시험 기대값이 동시에 무너짐). 코드 결함이 아니다 — 도메인 값을
+#  채워 금지문구≠치환문구로 만들면(예: "{{도메인 금지 문구 1}}" → 실제 금지어, phrase 인자도 그 실제
+#  금지어) 통과한다. docs/40 §3 참조.
 @pytest.mark.parametrize("phrase", ["{{도메인 금지 문구 1}}", "{{도메인 금지 문구 2}}"])
 def test_output_filter_blocks_forbidden_claims(phrase):
     import guard

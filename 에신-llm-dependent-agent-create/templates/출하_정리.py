@@ -11,6 +11,11 @@
 """
 import io, os, shutil, sys, zipfile, datetime
 from pathlib import Path
+# Windows 한글 콘솔(cp949)에서 「—」 같은 글자로 죽지 않게(실측 2026-09-17)
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 ROOT = Path(__file__).resolve().parents[2]
 APP = ROOT / "app"

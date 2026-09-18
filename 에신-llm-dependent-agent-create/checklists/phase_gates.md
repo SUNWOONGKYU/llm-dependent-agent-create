@@ -10,8 +10,8 @@
 | 2.5 → 3 (경로 B만) | `_개발자료/_design/phase_2.5_research_{날짜}.md` + PO 게이트 통과 | |
 | 3 → 4 | 발굴 카탈로그 또는 원자재 입고 카드 · 라이선스 판정 | |
 | 4 → 5 | `_개발자료/_design/bom.md`(5분류, 🔴 분리) · `SOURCE_REUSE_LOG.md` · `THIRD_PARTY_NOTICES.md` | 🔴 항목이 🟢에 없음 |
-| 5 → 6 | `_개발자료/_design/phase5_selfcheck.md`(5A 셀프 채점, 80 미만이면 PO 보고) | |
-| 6 → 6b | 폴더 표준 전부 존재(app/ · _개발자료/ · 루트 문서 5) · `app/skills/*.md` · `app/uicontract.py` · `_개발자료/tests/` 시험 하한(S 20 / M 60 / L 150) 통과 · GUI 트랙이면 `app/ui/index.html` 이 뼈대 복사본 + `_개발자료/_qc/smoke_ui.py` SMOKE PASS(고정표 자기 대조) · `시작.bat` 실기동 OK · **설계도(SVG·plan) 구현 기준으로 갱신** · `기획안_구현_대조표.md`(적힌 함수 전부 `test_documented_function_exists_and_is_called` 통과) · `verify_2nd` 호출부 존재 | `pytest -q` · `시작.bat` |
+| 5 → 6 | plan.md 확정본 · `_개발자료/_design/phase5_design_verify.md`(V1 설계 검증 — 이진 12항목 전항 O) | `checklists/phase5_설계검증.md` 전항 O |
+| 6 → 6b | 폴더 표준 전부 존재(app/ · _개발자료/ · 루트 문서 5) · `app/skills/*.md` · `app/uicontract.py` · `_개발자료/tests/` 시험 하한(S 20 / M 60 / L 150) 통과 · GUI 트랙이면 `app/ui/index.html` 이 뼈대 복사본 + `_개발자료/_qc/smoke_ui.py` SMOKE PASS(고정표 자기 대조) · `시작.bat` 실기동 OK · **아키텍처 파일(SVG·plan) 구현 기준으로 갱신** · `기획안_구현_대조표.md`(적힌 함수 전부 `test_documented_function_exists_and_is_called` 통과) · `verify_2nd` 호출부 존재 | `pytest -q` · `시작.bat` |
 | 6b → 7 | 시운전 1회 기록(약식·샘플 모드) — 사용자 여정 완주 증거(산출물 파일·state) | 재실행은 여정이 끊겼을 때만 |
 | 7 → 8 | `_개발자료/_qc/pre_verify_snapshot/` · `v1_report.md`(PASS 또는 결함 전부 소거) · L 이면 `v2_report.md` · GUI 이면 `v1_gui_대조표.md`(X 0) | 7-5 합격선 |
 | 8 → 9 | `출하_정리.py --지움` 실행 · `_개발자료/_qc/출하_보고서.md` · 자산 등재 1줄(`~/.claude/assets/자산-등재.md` 또는 `_개발자료/자산_등재.md`) · `/mbo-천상 report` 결과 MBO 파일에 추기 | |
