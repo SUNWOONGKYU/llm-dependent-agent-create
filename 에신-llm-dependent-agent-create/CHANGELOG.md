@@ -2,6 +2,19 @@
 
 > V4.0 부터는 이 파일에만 적는다. SKILL.md 에는 버전과 한 줄 요약만.
 
+V4.5 (2026-09-18) — 값 일치 대조 시험 기본 탑재
+  · **문제**: 변주 제조에서 반려의 대부분이 「코드는 맞는데 문서 하나가 옛 값」이었다. 같은 사실(이름·포트·LLM 폴백 순서·가드 개수 등)이 plan·bom·SVG·CLAUDE.md·README·매뉴얼·시험 등 **10곳 넘게 흩어져** 있어, 하나를 바꾸면 사람이든 AI든 반드시 한둘을 빠뜨린다. 기존 `test_documented_function_exists_and_is_called` 는 **함수**만 대조하고 **값**은 안 봤다.
+  · **실측(thesis-agent 이공계 변주, 2026-09-18)**: 재단 계획 11곳이 실제 15곳이었고(grep 이 4곳 추가 발견), 설계 V1 1회·출하 V1 1회가 **전부 문서 불일치로 반려**됐다(가드 개수 7종/8종 불일치 · CLAUDE.md 의 LLM 체인에 provider 하나 누락 = Critical). 검증 왕복 때문에 60분 시간표를 넘겼다.
+  · **대응**: `templates/test_gates.py` 에 **값 일치 대조 시험 4건** 기본 탑재 —
+      `test_value_brand_name_matches_everywhere`(ui.py BRAND ↔ index.html title/h1 ↔ 문서)
+      `test_value_port_matches_everywhere`(ui.py PORT ↔ README·매뉴얼의 localhost:NNNN)
+      `test_value_llm_chain_matches_docs`(engine.py providers ↔ CLAUDE.md·plan·bom)
+      `test_value_repeated_counts_match_across_docs`(「N종」 표기가 문서마다 어긋나는지)
+    → 문서 불일치가 **Phase 6b 시험 단계에서 즉시 FAIL** 한다. V1 까지 안 가므로 **검증 왕복이 사라진다.**
+  · **주의**: 「provider 이름이 문서 어딘가에 있으면 통과」로 짜면 못 잡는다(16조 표가 옛 체인이어도 다른 줄에 그 이름이 있으면 통과). **체인이 순서대로 인접해 나오는지**를 봐야 한다 — 실제로 이렇게 짰다가 Critical 을 놓쳤고, 순서 대조로 고친 뒤에야 잡혔다.
+  · **`_doc_funcs()` 오탐 필터 추가** — 대문자 상수(`guard._LATEX`·`llm.DEFAULTS` 등)를 함수로 오인해 「정의 없음」 오탐이 났다. 상수는 `def` 로 정의되지 않으므로 이 시험 대상이 아니다.
+  · 원자재 문서가 틀릴 수 있다는 실측도 함께 — 「BRAND 한 줄만 바꾸면 화면·매뉴얼에 다 반영된다」는 주석이 **사실이 아니었다**(index.html 이 문자열을 박아 둠). 컴파일·시험 186건·HTTP 200 을 전부 통과한 상태에서 **사람이 화면을 보고** 틀린 이름을 잡았다. **완료 판정의 마지막은 사람의 눈이다.**
+
 V4.4 (2026-09-18) — 제조 스킬·교육 자료 동시 개정(내부 기록 기준)
   · **Phase 5 개편** — "자체 점검(5A 100점 루브릭 + 5B 진단·해체)" 전면 폐지 → **설계서 확정 + 설계 검증**. 별도 검증자 V1(Claude Teammate Sonnet 5) 1회, 읽는 것은 plan.md(설계서)·관계도/흐름도 SVG·bom.md 문서뿐(코드 실행 없음). 판정은 점수가 아니라 **이진 체크리스트 12항목**(7대 구성요소 누락·흐름 끊김·붕 뜬 구성요소·목표서 불일치·BOM 위험부품/라이선스·실패모드 누락·부품↔기능 매핑 공백 등, 전문은 `checklists/phase5_설계검증.md`). 반려는 그 항목만 이진 재확인(재채점 없음). 신규 파일: `templates/V1_지시서_설계검증.md`·`checklists/phase5_설계검증.md`. 산출물명 `phase5_selfcheck.md` → `phase5_design_verify.md`
   · **Phase 7 범위 축소** — 설계 적합성은 Phase 5 에서 소진했으므로 "구현이 설계대로인가 + 실제로 도는가"에 집중. **6축→5축**(「구조 완성도」15점 제거 — 7대 구성요소 구현·문서 4종·폴더 표준은 Phase 5 이진 1·2·9번 항목으로 이관, 나머지 축 20/15/20/20/25로 재배분). 4단 QC 는 그대로(구현 확인이지 설계 확인이 아님). L 규모 V2 유지. 자기검증 금지 원칙 유지 — Phase 5 V1 과 Phase 7 V1 은 다른 세션이어야 함(§2 편제·docs/50 명문화)

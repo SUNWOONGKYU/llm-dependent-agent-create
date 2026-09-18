@@ -220,3 +220,83 @@ def test_scale_minimum():
 def test_mutation_sanity():
     # 시험이 «항상 통과»하는 헛시험이 아닌지 — 실제 파일을 읽는다는 것을 한 번 확인
     assert (APP / "run.py").exists() and (TRACK != "gui" or (ROOT / "시작.bat").exists())
+
+
+# ================================================================ 값 일치 대조 (V4.5 신설)
+# 왜 있나: 변주 제조에서 반려의 대부분이 「코드는 맞는데 문서 하나가 옛 값」이다.
+#   같은 사실(이름·포트·폴백 순서 등)이 plan·bom·SVG·헌법·README·매뉴얼·코드 등 10곳 넘게 흩어져 있어,
+#   하나를 바꾸면 사람이든 AI든 반드시 한두 곳을 빠뜨린다. 「조심하자」로는 못 막는다.
+#   기존 test_documented_function_exists_and_is_called 는 **함수**만 대조하고 **값**은 안 봤다.
+# 실측(2026-09-18 thesis-agent 변주): 이 시험이 없어서 재단 11곳 계획이 실제 15곳이 됐고,
+#   설계 V1 1회·출하 V1 1회가 전부 「문서 불일치」로 반려됐다. 왕복 때문에 60분 시간표를 넘겼다.
+# 이 시험이 있으면 그 반려가 **Phase 6b 시험 단계에서 즉시** 잡혀 검증 왕복이 사라진다.
+
+def _doc(rel: str) -> str:
+    p = ROOT / rel
+    return p.read_text(encoding="utf-8") if p.exists() else ""
+
+
+def test_value_brand_name_matches_everywhere():
+    """이름 — ui.py 의 BRAND 가 단일 출처. 화면·문서가 같은 이름을 써야 한다.
+    ⚠️ 「BRAND 한 줄만 바꾸면 다 반영된다」는 말은 **사실이 아니다** — index.html 은 문자열을 박아 둔다."""
+    ui_p = APP / "ui.py"
+    if not ui_p.exists():
+        pytest.skip("GUI 트랙 아님")
+    m = re.search(r'^BRAND\s*=\s*"([^"]+)"', ui_p.read_text(encoding="utf-8"), re.M)
+    if not m:
+        pytest.skip("BRAND 상수 없음")
+    brand = m.group(1)
+    html_p = APP / "ui" / "index.html"
+    if html_p.exists():
+        html = html_p.read_text(encoding="utf-8")
+        titles = re.findall(r"<title>([^<]*)</title>", html) + re.findall(r"<h1>([^<]*)</h1>", html)
+        for t in titles:
+            if "{{" in t or not t.strip():
+                continue
+            assert brand in t, "index.html 의 「%s」 가 BRAND(%s)를 안 쓴다 — 화면에 옛 이름이 뜬다" % (t[:40], brand)
+
+
+def test_value_port_matches_everywhere():
+    """포트 — ui.py 가 단일 출처. 매뉴얼·README 주소가 다르면 사용자가 눌러도 안 열린다."""
+    ui_p = APP / "ui.py"
+    if not ui_p.exists():
+        pytest.skip("GUI 트랙 아님")
+    m = re.search(r"^PORT\s*=\s*(\d+)", ui_p.read_text(encoding="utf-8"), re.M)
+    if not m:
+        pytest.skip("PORT 상수 없음")
+    port = m.group(1)
+    for rel in ("README.md", "사용자 매뉴얼(설치 및 사용법).html"):
+        for found in set(re.findall(r"localhost:(\d{4})", _doc(rel))):
+            assert found == port, "%s 가 localhost:%s 를 가리킨다 — 실제 포트는 %s" % (rel, found, port)
+
+
+def test_value_llm_chain_matches_docs():
+    """LLM 폴백 체인 — 코드가 단일 출처. 문서가 옛 체인을 적고 있으면 안 된다.
+    실측: 체인에 provider 를 하나 추가했는데 헌법(CLAUDE.md)만 안 고쳐져 출하 V1 Critical 이 됐다."""
+    eng_p = APP / "engine.py"
+    if not eng_p.exists():
+        pytest.skip("engine.py 없음")
+    chains = re.findall(r"providers=\[([^\]]+)\]", eng_p.read_text(encoding="utf-8"))
+    if not chains:
+        pytest.skip("providers 지정 없음")
+    provs = {x.strip().strip('"\'') for c in chains for x in c.split(",") if x.strip()}
+    for rel in ("CLAUDE.md", "_개발자료/_design/plan.md", "_개발자료/_design/bom.md"):
+        t = _doc(rel)
+        if not t:
+            continue
+        for prov in provs:
+            assert prov in t, "%s 에 LLM provider 「%s」 가 없다 — 코드가 쓰는 체인 %s 와 어긋난다" % (rel, prov, sorted(provs))
+
+
+def test_value_repeated_counts_match_across_docs():
+    """「N종」·「N개」처럼 문서마다 반복되는 개수가 서로 달라지지 않게 한다.
+    실측: 가드 개수를 8종으로 늘렸는데 plan.md 만 7종으로 남아 설계 V1 에서 반려됐다."""
+    docs = ["_개발자료/_design/plan.md"] + [
+        str(p.relative_to(ROOT)) for p in (ROOT / "_개발자료" / "_design").glob("*.svg")
+    ] if (ROOT / "_개발자료" / "_design").exists() else []
+    found = {}
+    for rel in docs:
+        for label, n in re.findall(r"(가드|구성요소|자리)\s*(\d+)\s*종", _doc(rel)):
+            found.setdefault(label, {}).setdefault(n, []).append(rel)
+    for label, byval in found.items():
+        assert len(byval) <= 1, "「%s N종」 표기가 문서마다 다르다: %s" % (label, {k: v for k, v in byval.items()})

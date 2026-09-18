@@ -135,7 +135,7 @@ V1 은 plan.md·관계도/흐름도 SVG·bom.md **문서만** 읽고 아래 12�
 └─ _개발자료/                     실무자 눈에 안 띄게
    ├─ _design/ plan.md · {이름}_architecture.svg · bom.md · phase5_design_verify.md · 기획안_구현_대조표.md (· phase_2.5_research)
    ├─ _qc/ 출하_보고서.md · v1_report · v1_gui_대조표 · v2_report · 캡처 · pre_verify_snapshot/
-   ├─ tests/ test_gates.py … (S 20 / M 60 / L 150)   ·   tools/ 출하_정리.py · verify_windows_adapter.ps1   ·   manual/
+   ├─ tests/ test_gates.py … (S 20 / M 60 / L 150) — **값 일치 대조 4건 기본 포함**(V4.5: 이름·포트·LLM 체인·개수 표기가 문서마다 어긋나면 FAIL)   ·   tools/ 출하_정리.py · verify_windows_adapter.ps1   ·   manual/
 ```
 7대 구성요소는 전부 파일로 존재해야 한다: 🎭 `skills/persona.md` · 🎯 목표(state·설정·우측 목표 블록) · 🤖 `llm.py` · 📘 `skills/*`·`vault/`·API · 🔧 도구 모듈(코드 계산 우선) · 🛡️ `guard`·게이트·상한·백업 · 🔁 `engine` 루프.
 
