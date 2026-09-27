@@ -1,4 +1,4 @@
-# 에신-llm-dependent-agent-create (V4.4)
+# 에신-llm-dependent-agent-create (V4.6)
 
 Claude Code용 **"에이전트를 만드는 스킬"** ★ 별칭 **에신 (에이전트의 신)** — LLM 의존형 AI 에이전트를 9-Phase 제조 공장으로 출하한다.
 
@@ -68,6 +68,7 @@ Invoke-WebRequest -Uri https://raw.githubusercontent.com/SUNWOONGKYU/mbo-skill/m
 
 - `에신-llm-dependent-agent-create/docs/00_에이전트_7대_구성요소_상세.md` — 7대 구성요소(페르소나·목표·LLM·지식베이스·도구·안전 체계·자율 루프) 심화 전문. Phase 1 문답·Phase 6 조립 전 필독.
 - `에신-llm-dependent-agent-create/docs/01_GUI_표준구성_템플릿.md` — 로컬 웹 GUI를 갖춘 에이전트(데스크톱형)의 표준 조립 템플릿. 실제 출하 사례 구성 분석 9절.
+- `에신-llm-dependent-agent-create/docs/05_요구발굴_12묶음_정의서.md` — Phase 1 요구 발굴 12묶음(목표·페르소나·LLM·지식베이스·도구·안전 체계·자율 루프 + 입력·출력·사용자 층·이름·유형 분류) 29개 하위 질문의 정의·경계·의존·묻는 순서(1~29)의 단일 출처.
 - 그 외 `docs/10`~`docs/90` — 시동·요구 발굴, 설계 산출물 규격, 조립, 시험, 검증·출하 검사, 출하·운영 루프 등 Phase별 상세. `SKILL.md`는 지휘 문서(순서·분기·게이트)만 담고 절차의 「어떻게」는 전부 `docs/`에 있다.
 
 ## 검증 편제
