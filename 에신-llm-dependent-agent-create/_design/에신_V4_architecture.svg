@@ -60,7 +60,7 @@
 <text x="630" y="541" font-size="11.2" fill="#334155">  SVG↔화면 1:1 · 시작.bat 실기동</text>
 <text x="630" y="556" font-size="11.2" fill="#334155">gui_고정표.md</text>
 <text x="630" y="571" font-size="11.2" fill="#334155">  좌0~4 · 중0~N · 우0~7 · 하단 · FAB</text>
-<text x="630" y="586" font-size="11.2" fill="#334155">phase5_설계검증.md (신규) — 이진 12항목</text>
+<text x="630" y="586" font-size="11.2" fill="#334155">phase5_설계검증.md (신규) — 이진 11항목</text>
 <rect x="60" y="720" width="780" height="200" rx="6" fill="#fffde7" stroke="#1f2a44" stroke-width="1.4"/>
 <text x="70" y="738" font-size="13" font-weight="700" fill="#1f2a44">산출물 = 에이전트 폴더 (공증 구조 그대로)</text>
 <text x="70" y="756" font-size="11.2" fill="#334155">app/  engine(State Machine) · store · llm(claude→codex 두 자리) · guard · uicontract · ui.py · ui/index.html · skills/*.md(SSOT) · config/</text>
@@ -136,7 +136,7 @@
 <line x1="1225.0" y1="655" x2="1225.0" y2="665" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
 <rect x="920" y="665" width="610" height="60" rx="6" fill="#ffffff" stroke="#1f2a44" stroke-width="1.4"/>
 <text x="930" y="683" font-size="13" font-weight="700" fill="#1f2a44">Phase 5 설계서 확정 + 설계 검증 🔍 (V1 1회, 문서만)</text>
-<text x="930" y="701" font-size="11.2" fill="#334155">plan·SVG·bom 만 읽고 이진 12항목 판정 → phase5_design_verify.md · 반려는 그 항목만 재확인, 전항 O → Phase 6</text>
+<text x="930" y="701" font-size="11.2" fill="#334155">plan·SVG·bom 만 읽고 이진 11항목 판정 → phase5_design_verify.md · 반려는 그 항목만 재확인, 전항 O → Phase 6</text>
 <line x1="1225.0" y1="725" x2="1225.0" y2="735" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
 <rect x="920" y="735" width="610" height="135" rx="6" fill="#f1f8e9" stroke="#1f2a44" stroke-width="1.4"/>
 <text x="930" y="753" font-size="13" font-weight="700" fill="#1f2a44">Phase 6 조립</text>
