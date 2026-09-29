@@ -26,7 +26,7 @@
 <text x="70" y="448" font-size="13" font-weight="700" fill="#1f2a44">docs/ (읽는 것 — Phase 별 1개)</text>
 <text x="70" y="466" font-size="11.2" fill="#334155">00 에이전트 7대 구성요소 상세</text>
 <text x="70" y="481" font-size="11.2" fill="#334155">01 GUI 표준 구성 템플릿(공증 분석)</text>
-<text x="70" y="496" font-size="11.2" fill="#334155">10 요구 발굴 12묶음 · 발굴 2경로</text>
+<text x="70" y="496" font-size="11.2" fill="#334155">10 요구 발굴 12개 요구 항목 · 발굴 2경로</text>
 <text x="70" y="511" font-size="11.2" fill="#334155">15 도메인 리서치(경로 B 만)</text>
 <text x="70" y="526" font-size="11.2" fill="#334155">20 설계 산출물 규격 + 갱신 규정</text>
 <text x="70" y="541" font-size="11.2" fill="#334155">    (plan · 관계도/흐름도 SVG · bom ·</text>
@@ -34,7 +34,7 @@
 <text x="70" y="571" font-size="11.2" fill="#334155">30 조립 공통(폴더·헌법·SSOT·계약)</text>
 <text x="70" y="586" font-size="11.2" fill="#334155">31 조립 GUI 트랙(고정표·어휘·라우트)</text>
 <text x="70" y="601" font-size="11.2" fill="#334155">32 조립 비GUI 트랙 / 웹사이트형</text>
-<text x="70" y="616" font-size="11.2" fill="#334155">40 시험 규격(최소 묶음·돌연변이)</text>
+<text x="70" y="616" font-size="11.2" fill="#334155">40 시험 규격(최소 시험 항목·돌연변이)</text>
 <text x="70" y="631" font-size="11.2" fill="#334155">50 검증 7-5 + V1/V2 지시서</text>
 <text x="70" y="646" font-size="11.2" fill="#334155">60 운영 루프 + 수리계약서</text>
 <rect x="340" y="430" width="250" height="250" rx="6" fill="#f1f8e9" stroke="#1f2a44" stroke-width="1.4"/>
@@ -102,7 +102,7 @@
 <text x="1770" y="154" font-size="11" font-weight="400" fill="#334155" text-anchor="start">예 → /skill-create</text>
 <line x1="1225.0" y1="207" x2="1225.0" y2="217" stroke="#1f2a44" stroke-width="1.4" marker-end="url(#ah)"/>
 <rect x="920" y="217" width="610" height="106" rx="6" fill="#f8fafc" stroke="#1f2a44" stroke-width="1.4"/>
-<text x="930" y="235" font-size="13" font-weight="700" fill="#1f2a44">Phase 1 요구 발굴 — 12묶음 29질문 문답 (초보자 친화 4규칙)</text>
+<text x="930" y="235" font-size="13" font-weight="700" fill="#1f2a44">Phase 1 요구 발굴 — 12개 요구 항목·최대 29개 확인할 것 문답 (초보자 친화 4규칙)</text>
 <text x="930" y="253" font-size="11.2" fill="#334155">docs/05·10 · 산출물 plan.md 초안 + 관계도·흐름도 SVG 초안</text>
 <text x="930" y="268" font-size="11.2" fill="#334155">◇ 원자재 있나? → A 지정 원자재(2.5·3 공개 발굴 생략) / B 공개 발굴</text>
 <text x="930" y="283" font-size="11.2" fill="#334155">◇ 트랙: 웹사이트형 / 데스크톱형+비개발자 = GUI 트랙 / 내부 도구·데몬 = 비GUI 트랙</text>

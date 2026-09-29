@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """시험 뼈대 — 에신 V4 templates/test_gates.py → _개발자료/tests/test_gates.py
 
-최소 묶음(docs/40 시험 규격). 규모별 하한: S 20 · M 60 · L 150 건. 이 파일은 그 뼈대 — 도메인 가드를 채운다.
+최소 시험 건수(docs/40 시험 규격). 규모별 하한: S 20 · M 60 · L 150 건. 이 파일은 그 뼈대 — 도메인 가드를 채운다.
 실행: set PYTHONUTF8=1 && python -m pytest _개발자료/tests -q -p no:cacheprovider
 원칙: ① 상태를 쓰는 함수는 임시 state 로만 ② «글자가 근처에 있는가» 시험 금지(함수 본문·라우트 경계로 자른다)
       ③ 새 시험은 일부러 망가뜨려 빨간불이 나는지 본 뒤 넣는다(돌연변이 1회) ④ 미확인 ≠ 통과
