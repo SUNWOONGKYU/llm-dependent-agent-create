@@ -40,4 +40,5 @@ PROBE_CONTRACT: dict[str, dict] = {
     "tools":  {"renderer": "chipRow", "element": "status-list", "note": "found True/False/None 세 값"},
     "kb":     {"renderer": "chipRow", "element": "kb-inject-row", "note": "①~④ + 작업 지식 행 id 로 매핑"},
     "backup": {"renderer": None, "element": "backup-line", "note": "loadStatus 가 직접 textContent 로 채운다"},
+    "seal":   {"renderer": None, "element": "seal-line", "note": "★V4.12 출하 봉인 경고 — 불일치일 때만 line 이 차고 안전 체계 블록의 #seal-row 가 보인다(새 패널 아님). loadStatus 가 직접 채운다"},
 }

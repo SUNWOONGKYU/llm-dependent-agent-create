@@ -144,6 +144,23 @@ _JOBS: dict[str, dict] = {}
 _JOBS_LOCK = threading.Lock()
 _ACTIVE = {"jid": None, "name": ""}
 _PROBE = {"cli": None, "running": False}
+_SEAL = {"line": "", "detail": ""}      # ★V4.12 출하 봉인 경고(불일치일 때만 채워짐). 새 패널 없이 우측 안전 체계 한 줄(#seal-row) + 로그
+
+
+def _check_seal():
+    """시작할 때 1회: app/seal_manifest.json(출하_정리.py --봉인) 과 지금 파일을 대조. 불일치는 «경고만» — 실행은 허용한다(docs/60).
+    seal_check.py·매니페스트가 없으면(개발 중·웹사이트형) 조용히 넘어간다."""
+    try:
+        import seal_check
+        res = seal_check.check(Path(__file__).resolve().parent)
+        msg = seal_check.message(res)
+    except Exception:
+        return
+    if msg:
+        _SEAL["line"] = "출하 뒤 파일이 바뀌었습니다 (%d개)" % (len(res["changed"]) + len(res["added"]) + len(res["removed"]))
+        _SEAL["detail"] = msg
+        print("[경고] " + msg)
+        store.log("시스템", "[출하 봉인 불일치] " + msg)
 _CHAT_LOG: list[dict] = []
 
 
@@ -275,7 +292,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             tools = engine.tool_rows(live) if hasattr(engine, "tool_rows") else []
             kb = engine.kb_rows() if hasattr(engine, "kb_rows") else {}
             backup = {"line": "단계가 바뀔 때마다 · 최근 20개 보관", "detail": "app/state_backups/ — 잘못 초기화됐으면 최신 파일을 state.json 으로 복사"}
-            return self._json(200, {"ok": True, "cli": cli, "llm": llm3, "tools": tools, "kb": kb, "backup": backup, "settings": store.load_state().get("settings")})
+            return self._json(200, {"ok": True, "cli": cli, "llm": llm3, "tools": tools, "kb": kb, "backup": backup, "seal": dict(_SEAL), "settings": store.load_state().get("settings")})
         if u.path == "/api/state":
             return self._json(200, store.load_state())
         if u.path == "/api/job":
@@ -377,6 +394,7 @@ def main():
         print("Most likely it is already running: open http://localhost:%d" % PORT)
         sys.exit(1)
     _write_lock(PORT)
+    _check_seal()
     url = "http://localhost:%d/?t=%s" % (PORT, TOKEN)
     print("%s v%s — http://localhost:%d  (local only)" % (APP_NAME, VERSION, PORT))
     print("Close this window to stop.  브라우저 탭을 닫아도 서버는 살아 있습니다 — 다 쓰셨으면 이 검은 창을 닫으세요.")

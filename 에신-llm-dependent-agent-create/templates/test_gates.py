@@ -4,7 +4,7 @@
 최소 시험 건수(docs/40 시험 규격). 규모별 하한: S 20 · M 60 · L 150 건. 이 파일은 그 뼈대 — 도메인 가드를 채운다.
 실행: set PYTHONUTF8=1 && python -m pytest _개발자료/tests -q -p no:cacheprovider
 원칙: ① 상태를 쓰는 함수는 임시 state 로만 ② «글자가 근처에 있는가» 시험 금지(함수 본문·라우트 경계로 자른다)
-      ③ 새 시험은 일부러 망가뜨려 빨간불이 나는지 본 뒤 넣는다(돌연변이 1회) ④ 미확인 ≠ 통과
+      ③ 새 시험은 일부러 망가뜨려 빨간불이 나는지 본 뒤 넣는다(작성자 수동 1회) ④ 미확인 ≠ 통과 ⑤ skip 뼈대·항진명제를 출하본에 남기지 않는다(test_no_skeleton_skips_left, docs/40 §3)
 주의: test_output_filter_blocks_forbidden_claims 2건은 모든 {{ }} 를 같은 더미값으로 치환하면 실패가
       정상이다(금지문구=치환문구). 코드 결함 아님 — 도메인 값(금지문구≠치환문구)을 채우면 통과. docs/40 §3
 """
@@ -144,11 +144,28 @@ def test_output_filter_blocks_forbidden_claims(phrase):
     assert phrase not in out and removed
 
 
-def test_irreversible_action_needs_confirm():
-    import engine
-    for act, meta in engine._ACTIONS.items():
-        if meta.get("irreversible"):
-            assert meta["irreversible"] is True   # 액션봇 confirm 관문이 표에 박혀 있다
+def _irreversible_actions():
+    try:
+        import engine
+    except ImportError:          # 뼈대 단계(app/ 없음) 수집용 — 실제 앱에서는 항상 import 된다
+        return []
+    return sorted(a for a, m in engine._ACTIONS.items() if m.get("irreversible"))
+
+
+@pytest.mark.parametrize("act", _irreversible_actions() or ["__해당없음__"])
+def test_irreversible_action_needs_confirm(act, monkeypatch):
+    """★V4.12 항진 시험 교체 — 구판은 `meta["irreversible"] is True` 를 방금 표에서 읽은 값에 대고 확인해 절대 실패하지 않았다.
+    이 판은 실제로 chat() 을 불러(LLM 은 fake) 비가역 액션이 confirm 없이는 job 을 시작하지 않고 needs_confirm 을 돌려주는지 본다."""
+    if act == "__해당없음__":
+        pytest.skip("해당없음 — 비가역 액션 없음(plan.md §2 도구 표와 일치해야 한다 — docs/50 §7-4b)")
+    import engine, llm
+    monkeypatch.setattr(llm, "call_json", lambda *a, **k: {"ok": True, "data": {"action": act, "args": {}, "reply": ""}, "error": None})
+    started = []
+    out = engine.chat("실행해 줘", False, lambda fn: started.append(fn) or "job")
+    assert out.get("needs_confirm") is True, "비가역 액션 %s 가 confirm 없이 통과" % act
+    assert not started, "confirm 전에 job 이 시작됐다: %s" % act
+    out2 = engine.chat("실행해 줘", True, lambda fn: started.append(fn) or "job")
+    assert not out2.get("needs_confirm"), "confirm=True 인데도 다시 확인을 요구한다: %s" % act
 
 
 def test_reset_path_requires_force_and_backup(tmp_path, monkeypatch):
@@ -213,6 +230,7 @@ def test_second_verifier_is_wired():
 # 가드 위반 시험은 가드 유형(결정형/판단형)별로 갈라서 쓴다(docs/50 §7-4b 와 일치):
 # 결정형은 무조건 차단 시험 1개, 판단형은 "승인 화면 표시 + 승인 없이 비가역 행동 불가" 시험 1개.
 # pytest.skip 은 "collect 는 되지만 아직 도메인 값을 안 채웠다"는 뜻이다. 채운 뒤에는 skip 을 지운다.
+# ★V4.12 아래 skip 뼈대가 출하본에 남으면 test_no_skeleton_skips_left 가 실패한다(docs/40 §3 — grep 1차 필터, 한계 있음).
 
 def test_call_budget_counts_actual_calls_incl_retry_fallback():
     """호출·비용 한도는 «사용자 요청 1건당 실제 LLM 호출 수(재시도·폴백 포함)»로 세야 한다(docs/50 §7-4b).
@@ -250,6 +268,109 @@ def test_judgment_type_guard_shows_unresolved_and_blocks_irreversible_without_ap
     pytest.skip("도메인 구현에 맞게 채워야 하는 뼈대 — docs/50 §7-4b · 요구값_강제_대조표.md 참조")
 
 
+# ───────────────────────────── 3b++. 차분 결속 시험 (★V4.12 — 규격 단일 출처 docs/40 §1b, 판정 docs/50 §7-4b-2)
+# 승인 뒤 «결과를 바꿀 수 있는 입력»을 하나씩 바꿨을 때, 달라진 payload 가 그 승인으로 transport 에 닿으면 실패.
+# 비가역 도구(게시·삭제·결제·전송)가 하나라도 있으면 IRREVERSIBLE = True 로 바꾸고 ▼ 도메인 함수를 채운다.
+# 채우지 않으면 NotImplementedError 로 빨갛게 남는다(skip 으로 숨지 않는다). fake 전용 — 실키·실호출·실발송 없음(docs/50 7-2).
+IRREVERSIBLE = False   # ▼ 도메인: plan.md §2 도구 표·Phase 1 coverage 선행 행(비가역 도구 유무)·docs/05 10번째 기록과 같아야 한다(V1 이 대조)
+EXEMPT = {             # 비교에서 빼는 입력 {키: 사유}. 사유가 비면 시험 실패. 키 표기: env:/profile:/draft: (docs/40 §1b). ▼ 도메인 것을 더한다
+    # 뼈대 자체(ui_skeleton·setup_helper)가 읽는 환경변수 — 전송 payload 와 무관(그 사실이 달라지면 이 사유를 다시 검토)
+    "env:LOCALAPPDATA": "토큰·런타임 파일 위치(Windows 사용자 폴더) — 전송 내용·대상에 안 들어감",
+    "env:NO_BROWSER": "화면 서버 시작 때 브라우저 자동 열기 여부 — 전송과 무관",
+    "env:UI_ALLOW_MULTI": "화면 서버 다중 기동 허용 여부 — 전송과 무관",
+}
+TABLE_FIELDS = set()   # ▼ 도메인(보충용): 요구값_강제_대조표 11행·docs/05 10번째에 적은 결속 필드 이름. 정답은 아래 기계 추출이고 이 표는 대조용이다
+_ENV_RE = [re.compile(p) for p in (r"os\.environ\.get\(\s*[\"']([A-Za-z_]\w*)", r"os\.environ\[\s*[\"']([A-Za-z_]\w*)", r"os\.getenv\(\s*[\"']([A-Za-z_]\w*)")]
+
+
+def _extract_inputs() -> set:
+    """결과를 바꿀 수 있는 입력을 **코드에서** 뽑는다(작성자 표에서 가져오면 «표가 좁으면 시험도 좁은» 자기참조가 된다).
+    (a) 프로필·설정 키 전체  (b) .env·환경변수 키 전수(os.environ·os.getenv)  (c) 초안 필드 전체. ▼ 도메인: 상수 이름이 다르면 아래 튜플에 더한다."""
+    found = set()
+    for p in APP.glob("*.py"):
+        src = p.read_text(encoding="utf-8", errors="ignore")
+        for rx in _ENV_RE:
+            found |= {"env:" + k for k in rx.findall(src)}
+    try:
+        import engine
+    except ImportError:
+        return found
+    for name in ("PROFILE_FIELDS", "SETTINGS_FIELDS"):
+        found |= {"profile:" + str(k) for k in getattr(engine, name, ())}
+    for name in ("DRAFT_FIELDS",):
+        found |= {"draft:" + str(k) for k in getattr(engine, name, ())}
+    return found
+
+
+class FakeTransport:
+    """마지막 소켓(HTTP·SMTP 호출)만 가짜로 바꾼다. 호출 전체 인자(URL·헤더·body)를 기록하고 Idempotency-Key 만 비교에서 뺀다."""
+    def __init__(self):
+        self.calls = []
+
+    def __call__(self, url, headers=None, body=None, **kw):
+        h = {str(k).lower(): v for k, v in (headers or {}).items() if str(k).lower() != "idempotency-key"}
+        self.calls.append({"url": url, "headers": h, "body": body, "extra": kw})
+        return {"ok": True}
+
+
+def _run_flow(monkeypatch, tmp_path, mutate=None, when="after_approval", approval_disabled=False) -> list:
+    """▼ 도메인 — 실제 «승인 → 발송» 경로를 fake LLM·FakeTransport 로 실행하고 transport 가 받은 호출 목록을 돌려준다.
+    · 항목 2건 이상을 발송하는 흐름이어야 한다(두 번째 건 시점 주입용).
+    · mutate=(입력 이름, "other_valid"|"empty") — when 시점에 그 입력을 바꾼다: "after_approval"(승인 직후·발송 전) / "second_item_before_transport"(2번째 건 transport 직전).
+    · approval_disabled=True — 승인 유효 판정을 항상 통과로 바꾼 대조군.
+    · 임시 폴더·monkeypatch 로만 쓴다(실 state 금지). 실키·실호출 금지."""
+    raise NotImplementedError("▼ 도메인: docs/40 §1b 규격대로 채운다")
+
+
+def test_irreversible_flag_matches_tools():
+    """IRREVERSIBLE=False 로 남아 차분 결속 시험이 통째로 skip 되는 것을 막는 자동 보조 검사(docs/50 §7-4b-2). 판정은 **코드 신호만** —
+    engine._ACTIONS 에 irreversible 액션이 있는데 IRREVERSIBLE=False 면 실패. plan.md 는 읽지 않는다(표 형식·표기가 제각각이라 파싱하면 오탐).
+    plan.md 도구 표의 비가역 도구 유무 ↔ IRREVERSIBLE 일치는 V1 이 `templates/V1_지시서.md` 「IRREVERSIBLE 스위치 일치」 줄로 사람이 판정한다."""
+    if IRREVERSIBLE:
+        return
+    acts = _irreversible_actions()
+    assert not acts, "engine._ACTIONS 에 비가역 액션 %s 이 있는데 IRREVERSIBLE=False — 차분 결속 시험이 skip 된다" % acts[:3]
+
+
+def test_binding_inputs_are_extracted_from_code():
+    if not IRREVERSIBLE:
+        pytest.skip("해당없음 — 비가역 도구 없음(IRREVERSIBLE=False)")
+    inputs = _extract_inputs()
+    assert inputs, "코드에서 추출된 입력이 0개 — _extract_inputs 가 이 앱 구조를 못 읽는다(상수 이름을 더한다)"
+    bad = [k for k, why in EXEMPT.items() if not str(why).strip()]
+    assert not bad, "EXEMPT 사유가 비어 있다: %s" % bad
+    code_only = inputs - {"%s" % t for t in TABLE_FIELDS} - set(EXEMPT)
+    assert not code_only, "코드엔 있는데 표(TABLE_FIELDS)에도 EXEMPT 에도 없다 — 표가 좁다: %s" % sorted(code_only)
+    table_only = set(TABLE_FIELDS) - inputs
+    assert not table_only, "표엔 있는데 코드에서 못 찾았다(추출 규칙이 좁거나 표가 틀림): %s" % sorted(table_only)
+
+
+@pytest.mark.parametrize("when", ["after_approval", "second_item_before_transport"])
+@pytest.mark.parametrize("variant", ["other_valid", "empty"])
+def test_binding_differential(when, variant, tmp_path, monkeypatch):
+    if not IRREVERSIBLE:
+        pytest.skip("해당없음 — 비가역 도구 없음(IRREVERSIBLE=False)")
+    base = _run_flow(monkeypatch, tmp_path, mutate=None, when=when)
+    assert base, "기준 실행에서 transport 호출이 0건 — 시험이 아무것도 못 잰다"
+    leaked = []
+    for key in sorted(_extract_inputs() - set(EXEMPT)):
+        sent = _run_flow(monkeypatch, tmp_path, mutate=(key, variant), when=when)
+        for i, call in enumerate(sent):
+            if i >= len(base) or call != base[i]:
+                leaked.append("%s(%s,%s) → %d번째 호출이 승인 시점과 다른데 전송됨" % (key, variant, when, i + 1))
+    assert not leaked, "승인 뒤 바뀐 payload 가 그 승인으로 나갔다:\n" + "\n".join(leaked)
+
+
+def test_binding_differential_control_changes_payload(tmp_path, monkeypatch):
+    """대조군 — 승인 검사를 무력화했을 때 payload 가 실제로 달라지는 입력이 1개 이상 있어야 시험이 «죽어 있지 않다»."""
+    if not IRREVERSIBLE:
+        pytest.skip("해당없음 — 비가역 도구 없음(IRREVERSIBLE=False)")
+    base = _run_flow(monkeypatch, tmp_path, mutate=None, approval_disabled=True)
+    moved = [k for k in sorted(_extract_inputs() - set(EXEMPT))
+             if _run_flow(monkeypatch, tmp_path, mutate=(k, "other_valid"), approval_disabled=True) != base]
+    assert moved, "승인을 꺼도 어떤 입력도 payload 를 바꾸지 못한다 — 입력 주입 또는 payload 덤프가 죽어 있다"
+
+
 # ───────────────────────────── 3c. 규모 하한
 def test_scale_minimum():
     """plan.md 규모(S/M/L)에 맞는 시험 수 — _개발자료/tests/*.py 의 test_ 함수 수(parametrize 는 1로 센다)."""
@@ -259,10 +380,25 @@ def test_scale_minimum():
     assert n >= MIN_TESTS[SCALE], "시험 %d건 < 규모 %s 하한 %d" % (n, SCALE, MIN_TESTS[SCALE])
 
 
-# ───────────────────────────── 4. 돌연변이 자가 검사 (이 파일이 진짜 재는지)
-def test_mutation_sanity():
-    # 시험이 «항상 통과»하는 헛시험이 아닌지 — 실제 파일을 읽는다는 것을 한 번 확인
+# ───────────────────────────── 4. 시험 파일 위생
+def test_app_files_exist():
+    # ★V4.12 개명(구 test_mutation_sanity) — 이름과 달리 돌연변이를 하지 않고, 시험이 실제 앱 파일을 읽는 경로가 맞는지만 본다
     assert (APP / "run.py").exists() and (TRACK != "gui" or (ROOT / "시작.bat").exists())
+
+
+_SKELETON_MARK = "도메인 구현에 맞게 채워야 하는 뼈대"
+
+
+def test_no_skeleton_skips_left():
+    """★V4.12 skip·항진 잔존 1차 필터 — 뼈대 상태의 `pytest.skip("…도메인 구현에 맞게 채워야 하는 뼈대…")`·`assert True` 가 시험 파일에 남아 있으면 실패.
+    ⚠ 한계(docs/40 §3): 이 시험은 문자열 필터일 뿐이다 — skipif·xfail 조합, `h == h` 변형, payload 를 안 읽는 시험은 못 잡는다.
+    실효 검증은 차분 결속 시험(3b++)이 실제로 도는가 + V1 의 시험 코드 읽기다."""
+    rx = re.compile(r"^\s*(?:pytest\.skip\(.*" + re.escape(_SKELETON_MARK) + r"|assert\s+True\b)", re.M)
+    left = []
+    for p in Path(__file__).parent.glob("test_*.py"):
+        for m in rx.finditer(p.read_text(encoding="utf-8")):
+            left.append("%s: %s" % (p.name, m.group(0).strip()[:60]))
+    assert not left, "skip·항진 뼈대가 남아 있다 — 채우거나(해당없음이면 사유를 적어 지운다): %s" % left
 
 
 # ================================================================ 값 일치 대조 (V4.5 신설)

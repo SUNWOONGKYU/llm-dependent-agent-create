@@ -60,5 +60,6 @@ powershell -ExecutionPolicy Bypass -File _개발자료/tools/verify_windows_adap
 
 **사용자에게 보내기 직전에는:**
 ```
-python _개발자료/tools/출하_정리.py --지움      # 시제 데이터·시험 데이터 삭제. 순서는 「시험 → 정리 → 포장」
+python _개발자료/tools/출하_정리.py --지움      # 시제 데이터·시험 데이터 삭제. 순서는 「시험 → 정리 → 봉인 → 포장」
+python _개발자료/tools/출하_정리.py --지움 --봉인 --포장   # ★V4.12 데스크톱형 — 출하 시점 해시를 app/seal_manifest.json 에 적어 zip 에 넣는다(변조 방지 아님, 출하 후 패치 탐지용)
 ```

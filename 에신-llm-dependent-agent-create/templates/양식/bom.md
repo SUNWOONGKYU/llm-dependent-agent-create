@@ -22,6 +22,6 @@
 ## 🔵 공통부 (뼈대·템플릿에서)
 | 부품 | 출처 |
 |---|---|
-| ui_skeleton.py · gui_skeleton/index.html · 시작.bat · CLAUDE.md · uicontract · setup_helper · 출하_정리 · test_gates | 에신 V4 templates/ |
+| ui_skeleton.py · gui_skeleton/index.html · 시작.bat · CLAUDE.md · uicontract · setup_helper · seal_check(★V4.12) · 출하_정리 · test_gates | 에신 V4 templates/ |
 
 → SOURCE_REUSE_LOG.md(실제 재사용한 것의 sha·커밋) · THIRD_PARTY_NOTICES.md 로 이어진다.
